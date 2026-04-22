@@ -1,6 +1,8 @@
 namespace tetris_fight.Features.Board.Presentation;
 
-public interface IBoardRenderViewModel
+using System.ComponentModel;
+
+public interface IBoardRenderViewModel : INotifyPropertyChanged
 {
     CellViewModel[] Cells { get; }
     CellViewModel[] NextPieceCells { get; }

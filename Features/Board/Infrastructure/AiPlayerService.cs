@@ -14,7 +14,8 @@ public sealed class AiPlayerService : IAiPlayerService
 
     private readonly IBoardService _board;
     private readonly Random _rng = new();
-    private Tetromino? _lastPiece;
+    private Tetromino? _lastSpawnedPiece;
+    private bool _isExecuting;
     private bool _disposed;
 
     public AiPlayerService(IBoardService board)
@@ -25,11 +26,16 @@ public sealed class AiPlayerService : IAiPlayerService
 
     private void OnStateChanged()
     {
+        if (_isExecuting) return;
+
         var state = _board.State;
         if (state.IsGameOver || state.CurrentPiece is null) return;
-        if (ReferenceEquals(state.CurrentPiece, _lastPiece)) return;
 
-        _lastPiece = state.CurrentPiece;
+        // Détecte uniquement le spawn d'une nouvelle pièce (row 0)
+        if (state.CurrentPosition.Row != 0) return;
+        if (ReferenceEquals(state.CurrentPiece, _lastSpawnedPiece)) return;
+
+        _lastSpawnedPiece = state.CurrentPiece;
 
         // Délai de réflexion avant d'exécuter le mouvement
         var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(ThinkDelayMs) };
@@ -47,17 +53,24 @@ public sealed class AiPlayerService : IAiPlayerService
         var state = _board.State;
         if (state.IsGameOver || state.CurrentPiece is null) return;
 
-        var (rotations, targetCol) = FindMove(state);
+        _isExecuting = true;
+        try
+        {
+            var (rotations, targetCol) = FindMove(state);
 
-        for (int i = 0; i < rotations; i++)
-            _board.TryRotate(clockwise: true);
+            for (int i = 0; i < rotations; i++)
+                _board.TryRotate(clockwise: true);
 
-        while (_board.State.CurrentPosition.Col > targetCol)
-            if (!_board.TryMoveLeft()) break;
+            while (_board.State.CurrentPosition.Col > targetCol)
+                if (!_board.TryMoveLeft()) break;
 
-        while (_board.State.CurrentPosition.Col < targetCol)
-            if (!_board.TryMoveRight()) break;
-
+            while (_board.State.CurrentPosition.Col < targetCol)
+                if (!_board.TryMoveRight()) break;
+        }
+        finally
+        {
+            _isExecuting = false;
+        }
         // Pas de hard drop : la gravité naturelle gère la descente
     }
 
