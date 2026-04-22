@@ -7,10 +7,10 @@
              Focusable="True">
 
     <UserControl.Resources>
-        <DataTemplate x:Key="BoardTemplate" x:DataType="boardVm:IBoardRenderViewModel" x:CompileBindings="False">
-            <Grid ColumnDefinitions="Auto,Auto" Background="#0d0d1a">
 
-                <!-- Plateau 10×20 -->
+        <!-- Template plateau local : type concret BoardViewModel -->
+        <DataTemplate x:Key="LocalBoardTemplate" x:DataType="boardVm:BoardViewModel">
+            <Grid ColumnDefinitions="Auto,Auto" Background="#0d0d1a">
                 <Grid Grid.Column="0">
                     <Border BorderBrush="#2a2a5a" BorderThickness="2">
                         <ItemsControl ItemsSource="{Binding Cells}">
@@ -28,8 +28,6 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </Border>
-
-                    <!-- Overlay game over -->
                     <Border IsVisible="{Binding IsGameOver}" Background="#CC000000">
                         <TextBlock Text="GAME OVER"
                                    Foreground="#FF4444" FontSize="22" FontWeight="Bold"
@@ -37,8 +35,6 @@
                                    VerticalAlignment="Center"/>
                     </Border>
                 </Grid>
-
-                <!-- Panneau latéral -->
                 <StackPanel Grid.Column="1" Margin="10,0,4,0" Width="80">
                     <TextBlock Text="SUIVANT"
                                Foreground="#aaaacc" FontSize="10" FontWeight="Bold" LetterSpacing="2"
@@ -58,14 +54,12 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-
                     <TextBlock Text="SCORE"
                                Foreground="#aaaacc" FontSize="10" FontWeight="Bold" LetterSpacing="2"
                                HorizontalAlignment="Center" Margin="0,16,0,4"/>
                     <TextBlock Text="{Binding Score}"
                                Foreground="#ffffff" FontSize="15" FontWeight="Bold"
                                HorizontalAlignment="Center"/>
-
                     <TextBlock Text="LIGNES"
                                Foreground="#aaaacc" FontSize="10" FontWeight="Bold" LetterSpacing="2"
                                HorizontalAlignment="Center" Margin="0,12,0,4"/>
@@ -75,6 +69,69 @@
                 </StackPanel>
             </Grid>
         </DataTemplate>
+
+        <!-- Template plateau adversaire : type concret OpponentBoardViewModel -->
+        <DataTemplate x:Key="OpponentBoardTemplate" x:DataType="boardVm:OpponentBoardViewModel">
+            <Grid ColumnDefinitions="Auto,Auto" Background="#0d0d1a">
+                <Grid Grid.Column="0">
+                    <Border BorderBrush="#2a2a5a" BorderThickness="2">
+                        <ItemsControl ItemsSource="{Binding Cells}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Rows="20" Columns="10"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="boardVm:CellViewModel">
+                                    <Border Background="{Binding Background}"
+                                            Width="26" Height="26"
+                                            BorderBrush="#1a1a3a" BorderThickness="1"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Border>
+                    <Border IsVisible="{Binding IsGameOver}" Background="#CC000000">
+                        <TextBlock Text="GAME OVER"
+                                   Foreground="#FF4444" FontSize="22" FontWeight="Bold"
+                                   LetterSpacing="2" HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+                <StackPanel Grid.Column="1" Margin="10,0,4,0" Width="80">
+                    <TextBlock Text="SUIVANT"
+                               Foreground="#aaaacc" FontSize="10" FontWeight="Bold" LetterSpacing="2"
+                               HorizontalAlignment="Center" Margin="0,12,0,10"/>
+                    <ItemsControl ItemsSource="{Binding NextPieceCells}" HorizontalAlignment="Center">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Rows="4" Columns="4"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="boardVm:CellViewModel">
+                                <Border Background="{Binding Background}"
+                                        Width="18" Height="18"
+                                        BorderBrush="#1a1a3a"
+                                        BorderThickness="{Binding CellBorderThickness}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock Text="SCORE"
+                               Foreground="#aaaacc" FontSize="10" FontWeight="Bold" LetterSpacing="2"
+                               HorizontalAlignment="Center" Margin="0,16,0,4"/>
+                    <TextBlock Text="{Binding Score}"
+                               Foreground="#ffffff" FontSize="15" FontWeight="Bold"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="LIGNES"
+                               Foreground="#aaaacc" FontSize="10" FontWeight="Bold" LetterSpacing="2"
+                               HorizontalAlignment="Center" Margin="0,12,0,4"/>
+                    <TextBlock Text="{Binding LinesCleared}"
+                               Foreground="#ffffff" FontSize="15" FontWeight="Bold"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
     </UserControl.Resources>
 
     <Grid Background="#0d0d1a" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -87,7 +144,7 @@
                            FontWeight="Bold" LetterSpacing="3"
                            HorizontalAlignment="Center" Margin="0,8,0,4"/>
                 <ContentControl Content="{Binding LocalBoard}"
-                                ContentTemplate="{StaticResource BoardTemplate}"/>
+                                ContentTemplate="{StaticResource LocalBoardTemplate}"/>
             </StackPanel>
 
             <!-- Séparateur VS + ping -->
@@ -96,18 +153,13 @@
                            FontSize="22" FontWeight="Black" HorizontalAlignment="Center"/>
                 <TextBlock Text="S" Foreground="#333366" FontFamily="Courier New"
                            FontSize="22" FontWeight="Black" HorizontalAlignment="Center"/>
-
                 <Rectangle Height="1" Width="30" Fill="#222244" Margin="0,6"/>
-
-                <!-- Ping -->
                 <TextBlock Text="PING" Foreground="#444466" FontFamily="Courier New"
                            FontSize="9" LetterSpacing="1" HorizontalAlignment="Center"/>
                 <TextBlock Text="{Binding PingText}"
                            Foreground="#00cc88" FontFamily="Courier New"
                            FontSize="11" FontWeight="Bold"
                            HorizontalAlignment="Center"/>
-
-                <!-- Statut connexion -->
                 <TextBlock Text="{Binding ConnectionStatus}"
                            Foreground="#555577" FontFamily="Courier New"
                            FontSize="9" LetterSpacing="1"
@@ -122,7 +174,7 @@
                            FontWeight="Bold" LetterSpacing="3"
                            HorizontalAlignment="Center" Margin="0,8,0,4"/>
                 <ContentControl Content="{Binding OpponentBoard}"
-                                ContentTemplate="{StaticResource BoardTemplate}"/>
+                                ContentTemplate="{StaticResource OpponentBoardTemplate}"/>
             </StackPanel>
         </Grid>
     </Grid>
