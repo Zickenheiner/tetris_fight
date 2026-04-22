@@ -48,7 +48,7 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
 
     public BoardViewModel() : this(new BoardService()) { }
 
-    public BoardViewModel(IBoardService boardService)
+    public BoardViewModel(IBoardService boardService, bool autoStart = true)
     {
         _boardService = boardService;
         _gameLoop = new GameLoopService(_boardService);
@@ -67,8 +67,14 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
 
         _inputDrainTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
         _inputDrainTimer.Tick += DrainInputQueue;
-        _inputDrainTimer.Start();
 
+        if (autoStart)
+            Start();
+    }
+
+    public void Start()
+    {
+        _inputDrainTimer.Start();
         _gameLoop.Start();
     }
 
@@ -150,8 +156,7 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
             for (int c = 0; c < BoardState.Cols; c++)
                 state.Grid[r, c] = null;
 
-        _inputDrainTimer.Start();
-        _gameLoop.Start();
+        Start();
     }
 
     private void RefreshGrid()

@@ -35,8 +35,6 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
         _network = network;
         _localService = new BoardService();
         _localService.StateChanged += OnLocalStateChanged;
-        LocalBoard = new BoardViewModel(_localService);
-        LocalBoard.ReturnToMenuRequested += () => ReturnToMenuRequested?.Invoke();
 
         _network.OpponentBoardReceived += snap => OpponentBoard.UpdateFromSnapshot(snap);
         _network.PingUpdated += ms => Ping = ms;
@@ -45,10 +43,19 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
 
         if (isHost)
         {
+            // Seed appliquée avant le premier SpawnPiece
             int seed = Random.Shared.Next();
             _localService.SetSeed(seed);
             _network.SendSeed(seed);
+            LocalBoard = new BoardViewModel(_localService, autoStart: true);
         }
+        else
+        {
+            // Démarrage différé : on attend la seed avant de spawner la première pièce
+            LocalBoard = new BoardViewModel(_localService, autoStart: false);
+        }
+
+        LocalBoard.ReturnToMenuRequested += () => ReturnToMenuRequested?.Invoke();
     }
 
     private void OnLocalStateChanged()
@@ -61,6 +68,7 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
     private void OnSeedReceived(int seed)
     {
         _localService.SetSeed(seed);
+        LocalBoard.Start();
     }
 
     private static BoardSnapshot BuildSnapshot(BoardState state)
