@@ -29,23 +29,22 @@
         <StackPanel Grid.Column="1" Margin="16,0,8,0" Width="120">
             <TextBlock Text="SUIVANT"
                        Foreground="#aaaacc" FontSize="12" FontWeight="Bold" LetterSpacing="2"
-                       HorizontalAlignment="Center" Margin="0,16,0,8"/>
-            <Border BorderBrush="#2a2a5a" BorderThickness="2" HorizontalAlignment="Center">
-                <ItemsControl ItemsSource="{Binding NextPieceCells}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <UniformGrid Rows="4" Columns="4"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="vm:CellViewModel">
-                            <Border Background="{Binding Background}"
-                                    Width="24" Height="24"
-                                    BorderBrush="#1a1a3a" BorderThickness="1"/>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </Border>
+                       HorizontalAlignment="Center" Margin="0,16,0,16"/>
+            <ItemsControl ItemsSource="{Binding NextPieceCells}" HorizontalAlignment="Center">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Rows="4" Columns="4"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:CellViewModel">
+                        <Border Background="{Binding Background}"
+                                Width="24" Height="24"
+                                BorderBrush="#1a1a3a"
+                                BorderThickness="{Binding CellBorderThickness}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </StackPanel>
 
     </Grid>

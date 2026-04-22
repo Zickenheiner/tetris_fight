@@ -23,8 +23,17 @@ public class CellViewModel : INotifyPropertyChanged
     public IBrush Background
     {
         get => _background;
-        set { _background = value; OnPropertyChanged(); }
+        set
+        {
+            _background = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(IsEmpty));
+            OnPropertyChanged(nameof(CellBorderThickness));
+        }
     }
+
+    public bool IsEmpty => ReferenceEquals(_background, Brushes.Transparent);
+    public Avalonia.Thickness CellBorderThickness => IsEmpty ? new Avalonia.Thickness(0) : new Avalonia.Thickness(1);
 
     public static IBrush GetBrush(TetrominoType? type) =>
         type.HasValue && BrushMap.TryGetValue(type.Value, out var b) ? b : Brushes.Transparent;
