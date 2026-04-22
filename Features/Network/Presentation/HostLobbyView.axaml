@@ -1,0 +1,84 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:tetris_fight.Features.Network.Presentation"
+             x:Class="tetris_fight.Features.Network.Presentation.HostLobbyView"
+             x:DataType="vm:HostLobbyViewModel">
+
+    <UserControl.Background>
+        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#06060e" Offset="0"/>
+            <GradientStop Color="#09091a" Offset="1"/>
+        </LinearGradientBrush>
+    </UserControl.Background>
+
+    <Grid RowDefinitions="*,Auto,*" Width="380" HorizontalAlignment="Center">
+
+        <!-- Titre -->
+        <StackPanel Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                    Spacing="0" Margin="0,0,0,40">
+            <Border BoxShadow="0 0 48 12 #3300F0F0" HorizontalAlignment="Center" Padding="8,0">
+                <TextBlock Text="HÉBERGER"
+                           Foreground="#00F0F0" FontFamily="Courier New"
+                           FontWeight="Black" FontSize="40" LetterSpacing="6"
+                           HorizontalAlignment="Center"/>
+            </Border>
+            <Border BoxShadow="0 0 48 12 #33F0A000" HorizontalAlignment="Center"
+                    Padding="8,0" Margin="0,-4,0,0">
+                <TextBlock Text="UNE PARTIE"
+                           Foreground="#F0A000" FontFamily="Courier New"
+                           FontWeight="Black" FontSize="40" LetterSpacing="6"
+                           HorizontalAlignment="Center"/>
+            </Border>
+        </StackPanel>
+
+        <!-- Contenu -->
+        <StackPanel Grid.Row="1" Spacing="24" HorizontalAlignment="Center">
+
+            <!-- Adresse IP -->
+            <Border Background="#0a0a1e" BorderBrush="#2a2a5a" BorderThickness="1"
+                    CornerRadius="4" Padding="20,16">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="ADRESSE IP"
+                               Foreground="#aaaacc" FontFamily="Courier New"
+                               FontSize="11" LetterSpacing="2" HorizontalAlignment="Center"/>
+                    <Border HorizontalAlignment="Center" BoxShadow="0 0 16 4 #4400F0F0">
+                        <TextBlock Text="{Binding IpAddress}"
+                                   Foreground="#00F0F0" FontFamily="Courier New"
+                                   FontSize="26" FontWeight="Bold"/>
+                    </Border>
+                    <TextBlock Text="{Binding Port, StringFormat='Port : {0}'}"
+                               Foreground="#555577" FontFamily="Courier New"
+                               FontSize="12" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Statut -->
+            <StackPanel HorizontalAlignment="Center" Spacing="10">
+                <TextBlock Text="{Binding Status}"
+                           Foreground="#aaaacc" FontFamily="Courier New"
+                           FontSize="14" LetterSpacing="1"
+                           HorizontalAlignment="Center"/>
+                <!-- Indicateur d'attente animé -->
+                <TextBlock Text="· · ·"
+                           Foreground="#00F0F0" FontFamily="Courier New"
+                           FontSize="20" HorizontalAlignment="Center"/>
+            </StackPanel>
+
+        </StackPanel>
+
+        <!-- Bouton retour -->
+        <StackPanel Grid.Row="2" VerticalAlignment="Top" Margin="0,40,0,0"
+                    HorizontalAlignment="Center">
+            <Button Content="← RETOUR AU MENU"
+                    Background="Transparent"
+                    Foreground="#444466"
+                    BorderThickness="0"
+                    FontFamily="Courier New"
+                    FontSize="13"
+                    LetterSpacing="1"
+                    Cursor="Hand"
+                    Click="OnCancelClick"/>
+        </StackPanel>
+    </Grid>
+
+</UserControl>

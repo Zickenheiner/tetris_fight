@@ -1,0 +1,91 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:tetris_fight.Features.Network.Presentation"
+             x:Class="tetris_fight.Features.Network.Presentation.JoinView"
+             x:DataType="vm:JoinViewModel">
+
+    <UserControl.Background>
+        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#06060e" Offset="0"/>
+            <GradientStop Color="#09091a" Offset="1"/>
+        </LinearGradientBrush>
+    </UserControl.Background>
+
+    <Grid RowDefinitions="*,Auto,*" Width="380" HorizontalAlignment="Center">
+
+        <!-- Titre -->
+        <StackPanel Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                    Spacing="0" Margin="0,0,0,40">
+            <Border BoxShadow="0 0 48 12 #33A000F0" HorizontalAlignment="Center" Padding="8,0">
+                <TextBlock Text="REJOINDRE"
+                           Foreground="#A000F0" FontFamily="Courier New"
+                           FontWeight="Black" FontSize="40" LetterSpacing="6"
+                           HorizontalAlignment="Center"/>
+            </Border>
+            <Border BoxShadow="0 0 48 12 #33F0A000" HorizontalAlignment="Center"
+                    Padding="8,0" Margin="0,-4,0,0">
+                <TextBlock Text="UNE PARTIE"
+                           Foreground="#F0A000" FontFamily="Courier New"
+                           FontWeight="Black" FontSize="40" LetterSpacing="6"
+                           HorizontalAlignment="Center"/>
+            </Border>
+        </StackPanel>
+
+        <!-- Formulaire -->
+        <StackPanel Grid.Row="1" Spacing="20" HorizontalAlignment="Center" Width="320">
+
+            <StackPanel Spacing="8">
+                <TextBlock Text="ADRESSE IP DE L'HÔTE"
+                           Foreground="#aaaacc" FontFamily="Courier New"
+                           FontSize="11" LetterSpacing="2"/>
+                <TextBox Text="{Binding Ip}"
+                         PlaceholderText="ex: 192.168.1.42"
+                         Background="#0a0a1e"
+                         Foreground="#00F0F0"
+                         BorderBrush="#2a2a5a"
+                         BorderThickness="1"
+                         FontFamily="Courier New"
+                         FontSize="18"
+                         Padding="12,8"
+                         CornerRadius="4"/>
+            </StackPanel>
+
+            <Button Content="REJOINDRE →"
+                    IsEnabled="{Binding CanConnect}"
+                    Background="#0a1a2a"
+                    Foreground="#00F0F0"
+                    BorderBrush="#00A0A0"
+                    BorderThickness="1"
+                    FontFamily="Courier New"
+                    FontSize="16"
+                    FontWeight="Bold"
+                    LetterSpacing="2"
+                    Padding="0,14"
+                    CornerRadius="3"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center"
+                    Cursor="Hand"
+                    Click="OnConnectClick"/>
+
+            <TextBlock Text="{Binding Status}"
+                       Foreground="#aaaacc" FontFamily="Courier New"
+                       FontSize="13" HorizontalAlignment="Center"
+                       IsVisible="{Binding Status, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+        </StackPanel>
+
+        <!-- Bouton retour -->
+        <StackPanel Grid.Row="2" VerticalAlignment="Top" Margin="0,30,0,0"
+                    HorizontalAlignment="Center">
+            <Button Content="← RETOUR AU MENU"
+                    Background="Transparent"
+                    Foreground="#444466"
+                    BorderThickness="0"
+                    FontFamily="Courier New"
+                    FontSize="13"
+                    LetterSpacing="1"
+                    Cursor="Hand"
+                    Click="OnCancelClick"/>
+        </StackPanel>
+    </Grid>
+
+</UserControl>

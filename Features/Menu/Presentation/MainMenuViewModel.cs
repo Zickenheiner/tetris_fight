@@ -15,8 +15,8 @@ public class MainMenuViewModel
         Items = new ObservableCollection<MenuItemViewModel>
         {
             new("Jouer en local",        "#00F0F0"),           // cyan  — I
-            new("Héberger une partie",   "#F0F000", false),    // yellow — O
-            new("Rejoindre une partie",  "#A000F0", false),    // purple — T
+            new("Héberger une partie",   "#F0F000"),           // yellow — O
+            new("Rejoindre une partie",  "#A000F0"),           // purple — T
             new("Paramètres",            "#F0A000", false),    // orange — L
             new("Quitter",               "#F04040"),           // red   — Z
         };

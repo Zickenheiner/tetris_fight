@@ -9,7 +9,7 @@ using tetris_fight.Features.Board.Application;
 using tetris_fight.Features.Board.Domain;
 using tetris_fight.Features.Board.Infrastructure;
 
-public class BoardViewModel : INotifyPropertyChanged
+public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
 {
     private readonly IBoardService _boardService;
     private readonly GameLoopService _gameLoop;
@@ -44,9 +44,11 @@ public class BoardViewModel : INotifyPropertyChanged
     private void OnPropertyChanged([CallerMemberName] string? name = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
-    public BoardViewModel()
+    public BoardViewModel() : this(new BoardService()) { }
+
+    public BoardViewModel(IBoardService boardService)
     {
-        _boardService = new BoardService();
+        _boardService = boardService;
         _gameLoop = new GameLoopService(_boardService);
 
         Cells = Enumerable.Range(0, BoardState.Rows * BoardState.Cols)
