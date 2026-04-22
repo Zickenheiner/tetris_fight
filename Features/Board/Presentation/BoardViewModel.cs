@@ -12,6 +12,7 @@ public class BoardViewModel
 
     public CellViewModel[] Cells { get; }
     public CellViewModel[] NextPieceCells { get; }
+    public bool ShowGhost { get; private set; } = true;
 
     public BoardViewModel()
     {
@@ -39,6 +40,7 @@ public class BoardViewModel
             case Key.Up:    _boardService.TryRotate(clockwise: true); break;
             case Key.Z:     _boardService.TryRotate(clockwise: false); break;
             case Key.Down:  _boardService.HardDrop(); break;
+            case Key.G:     ShowGhost = !ShowGhost; RefreshGrid(); break;
         }
     }
 
@@ -52,6 +54,18 @@ public class BoardViewModel
 
         if (state.CurrentPiece is not null)
         {
+            if (ShowGhost)
+            {
+                int ghostRow = _boardService.GetGhostRow();
+                foreach (var cell in state.CurrentPiece.Cells)
+                {
+                    int r = ghostRow + cell.Row;
+                    int c = state.CurrentPosition.Col + cell.Col;
+                    if (r >= 0 && r < BoardState.Rows && c >= 0 && c < BoardState.Cols)
+                        Cells[r * BoardState.Cols + c].Background = CellViewModel.GetGhostBrush(state.CurrentPiece.Type);
+                }
+            }
+
             foreach (var cell in state.CurrentPiece.Cells)
             {
                 int r = state.CurrentPosition.Row + cell.Row;

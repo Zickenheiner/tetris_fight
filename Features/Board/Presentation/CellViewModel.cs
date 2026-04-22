@@ -18,6 +18,17 @@ public class CellViewModel : INotifyPropertyChanged
         [TetrominoType.L] = new SolidColorBrush(Color.Parse("#FF8800")),
     };
 
+    private static readonly Dictionary<TetrominoType, IBrush> GhostBrushMap = new()
+    {
+        [TetrominoType.I] = new SolidColorBrush(Color.FromArgb(60, 0, 255, 255)),
+        [TetrominoType.O] = new SolidColorBrush(Color.FromArgb(60, 255, 215, 0)),
+        [TetrominoType.T] = new SolidColorBrush(Color.FromArgb(60, 170, 0, 255)),
+        [TetrominoType.S] = new SolidColorBrush(Color.FromArgb(60, 0, 204, 68)),
+        [TetrominoType.Z] = new SolidColorBrush(Color.FromArgb(60, 255, 51, 51)),
+        [TetrominoType.J] = new SolidColorBrush(Color.FromArgb(60, 51, 102, 255)),
+        [TetrominoType.L] = new SolidColorBrush(Color.FromArgb(60, 255, 136, 0)),
+    };
+
     private IBrush _background = Brushes.Transparent;
 
     public IBrush Background
@@ -37,6 +48,9 @@ public class CellViewModel : INotifyPropertyChanged
 
     public static IBrush GetBrush(TetrominoType? type) =>
         type.HasValue && BrushMap.TryGetValue(type.Value, out var b) ? b : Brushes.Transparent;
+
+    public static IBrush GetGhostBrush(TetrominoType? type) =>
+        type.HasValue && GhostBrushMap.TryGetValue(type.Value, out var b) ? b : Brushes.Transparent;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

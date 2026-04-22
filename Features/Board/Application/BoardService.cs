@@ -72,6 +72,15 @@ public class BoardService : IBoardService
         LockPiece();
     }
 
+    public int GetGhostRow()
+    {
+        if (State.CurrentPiece is null) return State.CurrentPosition.Row;
+        int row = State.CurrentPosition.Row;
+        while (IsValid(State.CurrentPiece, new Point(row + 1, State.CurrentPosition.Col)))
+            row++;
+        return row;
+    }
+
     public void LockPiece()
     {
         if (State.CurrentPiece is null) return;

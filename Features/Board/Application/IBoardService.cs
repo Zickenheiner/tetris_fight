@@ -12,5 +12,6 @@ public interface IBoardService
     bool TryRotate(bool clockwise);
     void HardDrop();
     void LockPiece();
+    int GetGhostRow();
     event Action? StateChanged;
 }
