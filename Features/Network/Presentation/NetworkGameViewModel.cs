@@ -31,10 +31,9 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
     {
         _network = network;
         _localService = new BoardService();
+        _localService.StateChanged += OnLocalStateChanged; // avant le démarrage du game loop
         LocalBoard = new BoardViewModel(_localService);
         LocalBoard.ReturnToMenuRequested += () => ReturnToMenuRequested?.Invoke();
-
-        _localService.StateChanged += OnLocalStateChanged;
 
         _network.OpponentBoardReceived += snap => OpponentBoard.UpdateFromSnapshot(snap);
         _network.PingUpdated += ms => Ping = ms;

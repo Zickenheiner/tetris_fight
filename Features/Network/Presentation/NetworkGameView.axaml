@@ -7,7 +7,7 @@
              Focusable="True">
 
     <UserControl.Resources>
-        <DataTemplate x:Key="BoardTemplate" x:DataType="boardVm:IBoardRenderViewModel">
+        <DataTemplate x:Key="BoardTemplate" x:DataType="boardVm:IBoardRenderViewModel" x:CompileBindings="False">
             <Grid ColumnDefinitions="Auto,Auto" Background="#0d0d1a">
 
                 <!-- Plateau 10×20 -->
