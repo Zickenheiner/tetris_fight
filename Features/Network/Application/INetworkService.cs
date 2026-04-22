@@ -10,9 +10,11 @@ public interface INetworkService : IDisposable
     Task StartHostAsync(CancellationToken ct = default);
     Task ConnectAsync(string ip, CancellationToken ct = default);
     void SendBoard(BoardSnapshot snapshot);
+    void SendSeed(int seed);
 
     event Action? Connected;
     event Action? Disconnected;
     event Action<BoardSnapshot>? OpponentBoardReceived;
     event Action<int>? PingUpdated;
+    event Action<int>? SeedReceived;
 }

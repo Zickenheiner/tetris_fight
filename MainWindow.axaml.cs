@@ -67,10 +67,10 @@ public partial class MainWindow : Window
         MainContent.Content = view;
     }
 
-    private void StartNetworkGame(TcpNetworkService network)
+    private void StartNetworkGame(TcpNetworkService network, bool isHost)
     {
         ResizeTo(820, 620);
-        var view = new NetworkGameView(network);
+        var view = new NetworkGameView(network, isHost);
         view.ReturnToMenuRequested += ShowMenu;
         MainContent.Content = view;
     }

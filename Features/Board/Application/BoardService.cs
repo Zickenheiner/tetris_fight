@@ -4,7 +4,7 @@ using tetris_fight.Features.Board.Domain;
 
 public class BoardService : IBoardService
 {
-    private readonly Random _random = new();
+    private Random _random = new();
 
     public BoardState State { get; } = new();
     public event Action? StateChanged;
@@ -147,6 +147,12 @@ public class BoardService : IBoardService
             State.LinesCleared += cleared;
             State.Score += LineScores[Math.Min(cleared, 4)];
         }
+    }
+
+    public void SetSeed(int seed)
+    {
+        _random = new Random(seed);
+        State.NextPiece = null;
     }
 
     private Tetromino CreateRandom()

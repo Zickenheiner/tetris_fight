@@ -13,6 +13,8 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
 {
     private readonly IBoardService _boardService;
     private readonly GameLoopService _gameLoop;
+    private readonly InputQueueService _inputQueue = new();
+    private readonly DispatcherTimer _inputDrainTimer;
 
     public CellViewModel[] Cells { get; }
     public CellViewModel[] NextPieceCells { get; }
@@ -61,8 +63,35 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
 
         _boardService.StateChanged += RefreshGrid;
         _boardService.GameOver += StartGameOverAnimation;
+        _boardService.GameOver += StopInputDrain;
+
+        _inputDrainTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
+        _inputDrainTimer.Tick += DrainInputQueue;
+        _inputDrainTimer.Start();
+
         _gameLoop.Start();
     }
+
+    private void DrainInputQueue(object? sender, EventArgs e)
+    {
+        foreach (var input in _inputQueue.DrainAll())
+            ProcessInput(input);
+    }
+
+    private void ProcessInput(GameInput input)
+    {
+        switch (input)
+        {
+            case GameInput.MoveLeft:  _boardService.TryMoveLeft(); break;
+            case GameInput.MoveRight: _boardService.TryMoveRight(); break;
+            case GameInput.MoveDown:  _boardService.TryMoveDown(); break;
+            case GameInput.RotateCW:  _boardService.TryRotate(clockwise: true); break;
+            case GameInput.RotateCCW: _boardService.TryRotate(clockwise: false); break;
+            case GameInput.HardDrop:  _boardService.HardDrop(); break;
+        }
+    }
+
+    private void StopInputDrain() => _inputDrainTimer.Stop();
 
     private void StartGameOverAnimation()
     {
@@ -94,12 +123,12 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
         }
         switch (key)
         {
-            case Key.Left:  _boardService.TryMoveLeft(); break;
-            case Key.Right: _boardService.TryMoveRight(); break;
-            case Key.Up:    _boardService.TryRotate(clockwise: true); break;
-            case Key.Z:     _boardService.TryRotate(clockwise: false); break;
-            case Key.Down:  _boardService.TryMoveDown(); RefreshGrid(); break;
-            case Key.Space: _boardService.HardDrop(); break;
+            case Key.Left:  _inputQueue.Enqueue(GameInput.MoveLeft); break;
+            case Key.Right: _inputQueue.Enqueue(GameInput.MoveRight); break;
+            case Key.Up:    _inputQueue.Enqueue(GameInput.RotateCW); break;
+            case Key.Z:     _inputQueue.Enqueue(GameInput.RotateCCW); break;
+            case Key.Down:  _inputQueue.Enqueue(GameInput.MoveDown); break;
+            case Key.Space: _inputQueue.Enqueue(GameInput.HardDrop); break;
             case Key.G:     ShowGhost = !ShowGhost; RefreshGrid(); break;
         }
     }
@@ -121,6 +150,7 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
             for (int c = 0; c < BoardState.Cols; c++)
                 state.Grid[r, c] = null;
 
+        _inputDrainTimer.Start();
         _gameLoop.Start();
     }
 

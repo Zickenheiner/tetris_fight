@@ -6,14 +6,14 @@ using tetris_fight.Features.Network.Infrastructure;
 
 public partial class JoinView : UserControl
 {
-    public event Action<TcpNetworkService>? GameReady;
+    public event Action<TcpNetworkService, bool>? GameReady;
     public event Action? ReturnToMenuRequested;
 
     public JoinView()
     {
         InitializeComponent();
         var vm = new JoinViewModel();
-        vm.GameReady += svc => GameReady?.Invoke(svc);
+        vm.GameReady += svc => GameReady?.Invoke(svc, false);
         vm.ReturnToMenuRequested += () => ReturnToMenuRequested?.Invoke();
         DataContext = vm;
     }

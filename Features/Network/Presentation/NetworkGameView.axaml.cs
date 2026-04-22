@@ -15,10 +15,10 @@ public partial class NetworkGameView : UserControl
         Focusable = true;
     }
 
-    public NetworkGameView(TcpNetworkService network)
+    public NetworkGameView(TcpNetworkService network, bool isHost)
         : this()
     {
-        var vm = new NetworkGameViewModel(network);
+        var vm = new NetworkGameViewModel(network, isHost);
         vm.ReturnToMenuRequested += () => ReturnToMenuRequested?.Invoke();
         DataContext = vm;
     }

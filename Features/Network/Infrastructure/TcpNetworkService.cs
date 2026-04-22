@@ -30,6 +30,7 @@ public sealed class TcpNetworkService : INetworkService
     public event Action? Disconnected;
     public event Action<BoardSnapshot>? OpponentBoardReceived;
     public event Action<int>? PingUpdated;
+    public event Action<int>? SeedReceived;
 
     public async Task StartHostAsync(CancellationToken ct = default)
     {
@@ -60,6 +61,11 @@ public sealed class TcpNetworkService : INetworkService
             Payload = JsonSerializer.Serialize(snapshot, JsonOpts)
         };
         SendMessage(msg);
+    }
+
+    public void SendSeed(int seed)
+    {
+        SendMessage(new NetworkMessage { Type = NetworkMessageType.Seed, Payload = seed.ToString() });
     }
 
     private void SetupStreams()
@@ -123,6 +129,11 @@ public sealed class TcpNetworkService : INetworkService
                     int rtt = (int)(Environment.TickCount64 - sent);
                     Dispatcher.UIThread.Post(() => PingUpdated?.Invoke(rtt));
                 }
+                break;
+
+            case NetworkMessageType.Seed when msg.Payload is not null:
+                if (int.TryParse(msg.Payload, out int seed))
+                    Dispatcher.UIThread.Post(() => SeedReceived?.Invoke(seed));
                 break;
         }
     }

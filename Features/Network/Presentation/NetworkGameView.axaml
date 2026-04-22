@@ -161,6 +161,26 @@
                 </Grid>
             </StackPanel>
         </Grid>
+
+        <!-- Overlay déconnexion -->
+        <Border IsVisible="{Binding IsDisconnected}"
+                Background="#DD000011"
+                HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16">
+                <TextBlock Text="CONNEXION PERDUE"
+                           Foreground="#FF4444" FontSize="26" FontWeight="Bold"
+                           FontFamily="Courier New" LetterSpacing="3"
+                           HorizontalAlignment="Center"/>
+                <TextBlock Text="L'adversaire s'est déconnecté."
+                           Foreground="#CC8888" FontSize="13"
+                           FontFamily="Courier New"
+                           HorizontalAlignment="Center"/>
+                <TextBlock Text="[Échap] pour revenir au menu"
+                           Foreground="#666688" FontSize="10"
+                           FontFamily="Courier New" LetterSpacing="1"
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
     </Grid>
 
 </UserControl>

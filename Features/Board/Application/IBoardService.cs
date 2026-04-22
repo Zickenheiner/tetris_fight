@@ -13,6 +13,7 @@ public interface IBoardService
     void HardDrop();
     void LockPiece();
     int GetGhostRow();
+    void SetSeed(int seed);
     event Action? StateChanged;
     event Action? GameOver;
 }

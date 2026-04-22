@@ -25,19 +25,30 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
     private string _connectionStatus = "Connecté";
     public string ConnectionStatus { get => _connectionStatus; private set { _connectionStatus = value; OnPropertyChanged(); } }
 
+    private bool _isDisconnected;
+    public bool IsDisconnected { get => _isDisconnected; private set { _isDisconnected = value; OnPropertyChanged(); } }
+
     public event Action? ReturnToMenuRequested;
 
-    public NetworkGameViewModel(INetworkService network)
+    public NetworkGameViewModel(INetworkService network, bool isHost = false)
     {
         _network = network;
         _localService = new BoardService();
-        _localService.StateChanged += OnLocalStateChanged; // avant le démarrage du game loop
+        _localService.StateChanged += OnLocalStateChanged;
         LocalBoard = new BoardViewModel(_localService);
         LocalBoard.ReturnToMenuRequested += () => ReturnToMenuRequested?.Invoke();
 
         _network.OpponentBoardReceived += snap => OpponentBoard.UpdateFromSnapshot(snap);
         _network.PingUpdated += ms => Ping = ms;
         _network.Disconnected += OnDisconnected;
+        _network.SeedReceived += OnSeedReceived;
+
+        if (isHost)
+        {
+            int seed = Random.Shared.Next();
+            _localService.SetSeed(seed);
+            _network.SendSeed(seed);
+        }
     }
 
     private void OnLocalStateChanged()
@@ -45,6 +56,11 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
         var state = _localService.State;
         var snapshot = BuildSnapshot(state);
         _network.SendBoard(snapshot);
+    }
+
+    private void OnSeedReceived(int seed)
+    {
+        _localService.SetSeed(seed);
     }
 
     private static BoardSnapshot BuildSnapshot(BoardState state)
@@ -92,6 +108,7 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
     private void OnDisconnected()
     {
         ConnectionStatus = "Adversaire déconnecté";
+        IsDisconnected = true;
     }
 
     public void HandleKey(Key key)
@@ -103,6 +120,7 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
     public void Dispose()
     {
         _localService.StateChanged -= OnLocalStateChanged;
+        _network.SeedReceived -= OnSeedReceived;
         _network.Dispose();
     }
 
