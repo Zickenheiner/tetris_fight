@@ -1,0 +1,52 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:tetris_fight.Features.Board.Presentation"
+             x:Class="tetris_fight.Features.Board.Presentation.BoardView"
+             x:DataType="vm:BoardViewModel">
+
+    <Grid ColumnDefinitions="Auto,Auto" Background="#0d0d1a"
+          HorizontalAlignment="Center" VerticalAlignment="Center">
+
+        <!-- Plateau de jeu 10×20 -->
+        <Border Grid.Column="0" BorderBrush="#2a2a5a" BorderThickness="2">
+            <ItemsControl ItemsSource="{Binding Cells}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Rows="20" Columns="10"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:CellViewModel">
+                        <Border Background="{Binding Background}"
+                                Width="30" Height="30"
+                                BorderBrush="#1a1a3a" BorderThickness="1"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Border>
+
+        <!-- Panneau latéral : pièce suivante -->
+        <StackPanel Grid.Column="1" Margin="16,0,8,0" Width="120">
+            <TextBlock Text="SUIVANT"
+                       Foreground="#aaaacc" FontSize="12" FontWeight="Bold" LetterSpacing="2"
+                       HorizontalAlignment="Center" Margin="0,16,0,8"/>
+            <Border BorderBrush="#2a2a5a" BorderThickness="2" HorizontalAlignment="Center">
+                <ItemsControl ItemsSource="{Binding NextPieceCells}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Rows="4" Columns="4"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:CellViewModel">
+                            <Border Background="{Binding Background}"
+                                    Width="24" Height="24"
+                                    BorderBrush="#1a1a3a" BorderThickness="1"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Border>
+        </StackPanel>
+
+    </Grid>
+</UserControl>
