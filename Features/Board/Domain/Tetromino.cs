@@ -37,4 +37,10 @@ public class Tetromino
         var rotated = Cells.Select(p => new Point(p.Col, BoundingBoxSize - 1 - p.Row)).ToArray();
         return new Tetromino(Type, rotated, BoundingBoxSize);
     }
+
+    public Tetromino RotateCounterClockwise()
+    {
+        var rotated = Cells.Select(p => new Point(BoundingBoxSize - 1 - p.Col, p.Row)).ToArray();
+        return new Tetromino(Type, rotated, BoundingBoxSize);
+    }
 }

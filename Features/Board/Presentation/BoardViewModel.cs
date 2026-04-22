@@ -1,5 +1,6 @@
 namespace tetris_fight.Features.Board.Presentation;
 
+using Avalonia.Input;
 using tetris_fight.Features.Board.Application;
 using tetris_fight.Features.Board.Domain;
 using tetris_fight.Features.Board.Infrastructure;
@@ -27,6 +28,18 @@ public class BoardViewModel
 
         _boardService.StateChanged += RefreshGrid;
         _gameLoop.Start();
+    }
+
+    public void HandleKey(Key key)
+    {
+        switch (key)
+        {
+            case Key.Left:  _boardService.TryMoveLeft(); break;
+            case Key.Right: _boardService.TryMoveRight(); break;
+            case Key.Up:    _boardService.TryRotate(clockwise: true); break;
+            case Key.Z:     _boardService.TryRotate(clockwise: false); break;
+            case Key.Down:  _boardService.HardDrop(); break;
+        }
     }
 
     private void RefreshGrid()

@@ -29,10 +29,10 @@ public class GameLoopService
     {
         _tickCount++;
 
-        // augmente la vitesse tous les 10 ticks (minimum 100ms)
-        if (_tickCount % 10 == 0)
+        // augmente la vitesse tous les 20 ticks (-15ms par palier, minimum 200ms)
+        if (_tickCount % 20 == 0)
         {
-            var faster = TimeSpan.FromMilliseconds(Math.Max(100, _timer.Interval.TotalMilliseconds - 40));
+            var faster = TimeSpan.FromMilliseconds(Math.Max(200, _timer.Interval.TotalMilliseconds - 15));
             _timer.Interval = faster;
         }
 

@@ -7,6 +7,10 @@ public interface IBoardService
     BoardState State { get; }
     void SpawnPiece();
     bool TryMoveDown();
+    bool TryMoveLeft();
+    bool TryMoveRight();
+    bool TryRotate(bool clockwise);
+    void HardDrop();
     void LockPiece();
     event Action? StateChanged;
 }

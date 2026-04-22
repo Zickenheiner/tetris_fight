@@ -30,6 +30,48 @@ public class BoardService : IBoardService
         return true;
     }
 
+    public bool TryMoveLeft()
+    {
+        if (State.CurrentPiece is null) return false;
+        var next = State.CurrentPosition with { Col = State.CurrentPosition.Col - 1 };
+        if (!IsValid(State.CurrentPiece, next)) return false;
+        State.CurrentPosition = next;
+        StateChanged?.Invoke();
+        return true;
+    }
+
+    public bool TryMoveRight()
+    {
+        if (State.CurrentPiece is null) return false;
+        var next = State.CurrentPosition with { Col = State.CurrentPosition.Col + 1 };
+        if (!IsValid(State.CurrentPiece, next)) return false;
+        State.CurrentPosition = next;
+        StateChanged?.Invoke();
+        return true;
+    }
+
+    public bool TryRotate(bool clockwise)
+    {
+        if (State.CurrentPiece is null) return false;
+        var rotated = clockwise ? State.CurrentPiece.RotateClockwise() : State.CurrentPiece.RotateCounterClockwise();
+        if (!IsValid(rotated, State.CurrentPosition)) return false;
+        State.CurrentPiece = rotated;
+        StateChanged?.Invoke();
+        return true;
+    }
+
+    public void HardDrop()
+    {
+        if (State.CurrentPiece is null) return;
+        while (true)
+        {
+            var next = State.CurrentPosition with { Row = State.CurrentPosition.Row + 1 };
+            if (!IsValid(State.CurrentPiece, next)) break;
+            State.CurrentPosition = next;
+        }
+        LockPiece();
+    }
+
     public void LockPiece()
     {
         if (State.CurrentPiece is null) return;
