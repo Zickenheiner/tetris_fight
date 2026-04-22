@@ -38,7 +38,11 @@
                                FontWeight="Bold"
                                LetterSpacing="4"
                                HorizontalAlignment="Center"/>
-                    <TextBlock Text="Appuyez sur R pour rejouer"
+                    <TextBlock Text="R — Rejouer"
+                               Foreground="#888899"
+                               FontSize="13"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Échap — Menu principal"
                                Foreground="#888899"
                                FontSize="13"
                                HorizontalAlignment="Center"/>

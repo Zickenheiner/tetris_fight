@@ -25,6 +25,7 @@ public class BoardViewModel : INotifyPropertyChanged
         private set { _isGameOver = value; OnPropertyChanged(); }
     }
 
+    public event Action? ReturnToMenuRequested;
     public event PropertyChangedEventHandler? PropertyChanged;
     private void OnPropertyChanged([CallerMemberName] string? name = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
@@ -72,6 +73,7 @@ public class BoardViewModel : INotifyPropertyChanged
         if (IsGameOver)
         {
             if (key == Key.R) Restart();
+            if (key == Key.Escape) ReturnToMenuRequested?.Invoke();
             return;
         }
         switch (key)
@@ -80,7 +82,8 @@ public class BoardViewModel : INotifyPropertyChanged
             case Key.Right: _boardService.TryMoveRight(); break;
             case Key.Up:    _boardService.TryRotate(clockwise: true); break;
             case Key.Z:     _boardService.TryRotate(clockwise: false); break;
-            case Key.Down:  _boardService.HardDrop(); break;
+            case Key.Down:  _boardService.TryMoveDown(); RefreshGrid(); break;
+            case Key.Space: _boardService.HardDrop(); break;
             case Key.G:     ShowGhost = !ShowGhost; RefreshGrid(); break;
         }
     }

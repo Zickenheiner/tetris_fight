@@ -6,10 +6,14 @@ using Avalonia.Input;
 
 public partial class BoardView : UserControl
 {
+    public event Action? ReturnToMenuRequested;
+
     public BoardView()
     {
         InitializeComponent();
-        DataContext = new BoardViewModel();
+        var vm = new BoardViewModel();
+        vm.ReturnToMenuRequested += () => ReturnToMenuRequested?.Invoke();
+        DataContext = vm;
         Focusable = true;
     }
 

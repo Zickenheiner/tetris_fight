@@ -24,7 +24,9 @@ public partial class MainWindow : Window
         switch (action)
         {
             case "Jouer en local":
-                MainContent.Content = new BoardView();
+                var board = new BoardView();
+                board.ReturnToMenuRequested += ShowMenu;
+                MainContent.Content = board;
                 break;
             case "Quitter":
                 Close();
