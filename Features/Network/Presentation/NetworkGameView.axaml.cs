@@ -9,13 +9,18 @@ public partial class NetworkGameView : UserControl
 {
     public event Action? ReturnToMenuRequested;
 
-    public NetworkGameView(TcpNetworkService network)
+    public NetworkGameView()
     {
         InitializeComponent();
+        Focusable = true;
+    }
+
+    public NetworkGameView(TcpNetworkService network)
+        : this()
+    {
         var vm = new NetworkGameViewModel(network);
         vm.ReturnToMenuRequested += () => ReturnToMenuRequested?.Invoke();
         DataContext = vm;
-        Focusable = true;
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)

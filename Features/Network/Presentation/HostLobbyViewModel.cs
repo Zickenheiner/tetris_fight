@@ -8,6 +8,7 @@ public sealed class HostLobbyViewModel : INotifyPropertyChanged, IDisposable
 {
     private readonly TcpNetworkService _network = new();
     private readonly CancellationTokenSource _cts = new();
+    private bool _networkTransferred;
 
     public string IpAddress => _network.LocalIpAddress;
     public int Port => _network.ListenPort;
@@ -44,12 +45,15 @@ public sealed class HostLobbyViewModel : INotifyPropertyChanged, IDisposable
     private void OnConnected()
     {
         Status = "Joueur connecté !";
+        _networkTransferred = true;
         GameReady?.Invoke(_network);
     }
 
     public void Cancel()
     {
         _cts.Cancel();
+        if (!_networkTransferred)
+            _network.Dispose();
         ReturnToMenuRequested?.Invoke();
     }
 
@@ -58,6 +62,8 @@ public sealed class HostLobbyViewModel : INotifyPropertyChanged, IDisposable
         _network.Connected -= OnConnected;
         _cts.Cancel();
         _cts.Dispose();
+        if (!_networkTransferred)
+            _network.Dispose();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

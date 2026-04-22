@@ -8,6 +8,7 @@ public sealed class JoinViewModel : INotifyPropertyChanged, IDisposable
 {
     private TcpNetworkService? _network;
     private readonly CancellationTokenSource _cts = new();
+    private bool _networkTransferred;
 
     private string _ip = string.Empty;
     public string Ip
@@ -42,18 +43,21 @@ public sealed class JoinViewModel : INotifyPropertyChanged, IDisposable
         OnPropertyChanged(nameof(CanConnect));
         Status = "Connexion en cours...";
 
-        _network = new TcpNetworkService();
+        var network = new TcpNetworkService();
+        _network = network;
         try
         {
-            await _network.ConnectAsync(_ip.Trim(), _cts.Token);
+            await network.ConnectAsync(_ip.Trim(), _cts.Token);
             Status = "Connecté !";
-            GameReady?.Invoke(_network);
+            _networkTransferred = true;
+            _network = null;
+            GameReady?.Invoke(network);
         }
         catch (OperationCanceledException) { }
         catch
         {
             Status = "Connexion échouée. Vérifiez l'adresse IP.";
-            _network.Dispose();
+            _network?.Dispose();
             _network = null;
             _isConnecting = false;
             OnPropertyChanged(nameof(CanConnect));
@@ -70,7 +74,8 @@ public sealed class JoinViewModel : INotifyPropertyChanged, IDisposable
     {
         _cts.Cancel();
         _cts.Dispose();
-        _network?.Dispose();
+        if (!_networkTransferred)
+            _network?.Dispose();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
