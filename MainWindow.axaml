@@ -1,11 +1,11 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:board="using:tetris_fight.Features.Board.Presentation"
         x:Class="tetris_fight.MainWindow"
         Title="Tetris Fight"
         Width="460" Height="660"
         Background="#0d0d1a"
         CanResize="False">
 
-    <board:BoardView/>
+    <ContentControl x:Name="MainContent"/>
+
 </Window>

@@ -1,0 +1,245 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:tetris_fight.Features.Menu.Presentation"
+             x:Class="tetris_fight.Features.Menu.Presentation.MainMenuView"
+             x:DataType="vm:MainMenuViewModel"
+             Focusable="True">
+
+    <UserControl.Background>
+        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#06060e" Offset="0"/>
+            <GradientStop Color="#09091a" Offset="0.5"/>
+            <GradientStop Color="#060610" Offset="1"/>
+        </LinearGradientBrush>
+    </UserControl.Background>
+
+    <Grid>
+
+        <!-- ── Vignette ── -->
+        <Rectangle IsHitTestVisible="False">
+            <Rectangle.Fill>
+                <RadialGradientBrush>
+                    <GradientStop Color="#00000000" Offset="0.3"/>
+                    <GradientStop Color="#88000000" Offset="1"/>
+                </RadialGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+
+        <!-- ── Pièces décoratives (fond, bas opacité) ── -->
+        <Canvas IsHitTestVisible="False" Opacity="1">
+
+            <!-- I-piece (cyan) — haut gauche -->
+            <Grid Canvas.Left="18" Canvas.Top="110" Width="64" Height="16" Opacity="0.09">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" Background="#00F0F0" Margin="1" CornerRadius="1"/>
+                <Border Grid.Column="1" Background="#00F0F0" Margin="1" CornerRadius="1"/>
+                <Border Grid.Column="2" Background="#00F0F0" Margin="1" CornerRadius="1"/>
+                <Border Grid.Column="3" Background="#00F0F0" Margin="1" CornerRadius="1"/>
+            </Grid>
+
+            <!-- O-piece (yellow) — haut droit -->
+            <Grid Canvas.Left="380" Canvas.Top="76" Width="34" Height="34" Opacity="0.10">
+                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                <Grid.RowDefinitions><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                <Border Grid.Row="0" Grid.Column="0" Background="#F0F000" Margin="1" CornerRadius="1"/>
+                <Border Grid.Row="0" Grid.Column="1" Background="#F0F000" Margin="1" CornerRadius="1"/>
+                <Border Grid.Row="1" Grid.Column="0" Background="#F0F000" Margin="1" CornerRadius="1"/>
+                <Border Grid.Row="1" Grid.Column="1" Background="#F0F000" Margin="1" CornerRadius="1"/>
+            </Grid>
+
+            <!-- T-piece (purple) — haut droit -->
+            <Grid Canvas.Left="355" Canvas.Top="155" Width="50" Height="34" Opacity="0.09">
+                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                <Grid.RowDefinitions><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                <Border Grid.Row="0" Grid.Column="1" Background="#A000F0" Margin="1" CornerRadius="1"/>
+                <Border Grid.Row="1" Grid.Column="0" Background="#A000F0" Margin="1" CornerRadius="1"/>
+                <Border Grid.Row="1" Grid.Column="1" Background="#A000F0" Margin="1" CornerRadius="1"/>
+                <Border Grid.Row="1" Grid.Column="2" Background="#A000F0" Margin="1" CornerRadius="1"/>
+            </Grid>
+
+            <!-- L-piece (orange) — bas gauche -->
+            <Grid Canvas.Left="24" Canvas.Top="480" Width="34" Height="50" Opacity="0.09">
+                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                <Border Grid.Row="0" Grid.Column="0" Background="#F0A000" Margin="1" CornerRadius="1"/>
+                <Border Grid.Row="1" Grid.Column="0" Background="#F0A000" Margin="1" CornerRadius="1"/>
+                <Border Grid.Row="2" Grid.Column="0" Background="#F0A000" Margin="1" CornerRadius="1"/>
+                <Border Grid.Row="2" Grid.Column="1" Background="#F0A000" Margin="1" CornerRadius="1"/>
+            </Grid>
+
+            <!-- S-piece (green) — bas droit -->
+            <Grid Canvas.Left="378" Canvas.Top="490" Width="50" Height="34" Opacity="0.09">
+                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                <Grid.RowDefinitions><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                <Border Grid.Row="0" Grid.Column="1" Background="#00F000" Margin="1" CornerRadius="1"/>
+                <Border Grid.Row="0" Grid.Column="2" Background="#00F000" Margin="1" CornerRadius="1"/>
+                <Border Grid.Row="1" Grid.Column="0" Background="#00F000" Margin="1" CornerRadius="1"/>
+                <Border Grid.Row="1" Grid.Column="1" Background="#00F000" Margin="1" CornerRadius="1"/>
+            </Grid>
+
+            <!-- Z-piece (red) — milieu gauche -->
+            <Grid Canvas.Left="14" Canvas.Top="310" Width="50" Height="34" Opacity="0.07">
+                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                <Grid.RowDefinitions><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                <Border Grid.Row="0" Grid.Column="0" Background="#F04040" Margin="1" CornerRadius="1"/>
+                <Border Grid.Row="0" Grid.Column="1" Background="#F04040" Margin="1" CornerRadius="1"/>
+                <Border Grid.Row="1" Grid.Column="1" Background="#F04040" Margin="1" CornerRadius="1"/>
+                <Border Grid.Row="1" Grid.Column="2" Background="#F04040" Margin="1" CornerRadius="1"/>
+            </Grid>
+
+            <!-- J-piece (blue) — milieu droit -->
+            <Grid Canvas.Left="400" Canvas.Top="300" Width="34" Height="50" Opacity="0.07">
+                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                <Border Grid.Row="0" Grid.Column="1" Background="#4040F0" Margin="1" CornerRadius="1"/>
+                <Border Grid.Row="1" Grid.Column="1" Background="#4040F0" Margin="1" CornerRadius="1"/>
+                <Border Grid.Row="2" Grid.Column="0" Background="#4040F0" Margin="1" CornerRadius="1"/>
+                <Border Grid.Row="2" Grid.Column="1" Background="#4040F0" Margin="1" CornerRadius="1"/>
+            </Grid>
+
+        </Canvas>
+
+        <!-- ── Contenu principal ── -->
+        <Grid RowDefinitions="*,Auto,Auto"
+              Width="340"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Stretch">
+
+            <!-- Titre -->
+            <StackPanel Grid.Row="0" VerticalAlignment="Bottom" Margin="0,0,0,36"
+                        HorizontalAlignment="Center" Spacing="0">
+
+                <!-- "TETRIS" avec halo cyan -->
+                <Border Background="#00000008"
+                        BoxShadow="0 0 48 12 #3300F0F0"
+                        HorizontalAlignment="Center"
+                        Padding="8,0">
+                    <TextBlock Text="TETRIS"
+                               Foreground="#00F0F0"
+                               FontFamily="Courier New"
+                               FontWeight="Black"
+                               FontSize="64"
+                               LetterSpacing="9"
+                               HorizontalAlignment="Center"/>
+                </Border>
+
+                <!-- "FIGHT" avec halo orange -->
+                <Border Background="#00000008"
+                        BoxShadow="0 0 48 12 #33F0A000"
+                        HorizontalAlignment="Center"
+                        Padding="8,0"
+                        Margin="0,-6,0,0">
+                    <TextBlock Text="FIGHT"
+                               Foreground="#F0A000"
+                               FontFamily="Courier New"
+                               FontWeight="Black"
+                               FontSize="64"
+                               LetterSpacing="9"
+                               HorizontalAlignment="Center"/>
+                </Border>
+
+                <!-- Séparateur décoratif -->
+                <Grid Margin="0,18,0,0" HorizontalAlignment="Center" Width="260">
+                    <Rectangle Height="1">
+                        <Rectangle.Fill>
+                            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                                <GradientStop Color="#0000F0F0" Offset="0"/>
+                                <GradientStop Color="#8800F0F0" Offset="0.5"/>
+                                <GradientStop Color="#0000F0F0" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                    <Border Width="6" Height="6"
+                            Background="#00F0F0"
+                            HorizontalAlignment="Center"
+                            BoxShadow="0 0 8 2 #8800F0F0"/>
+                </Grid>
+            </StackPanel>
+
+            <!-- Items du menu -->
+            <ItemsControl Grid.Row="1" ItemsSource="{Binding Items}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:MenuItemViewModel">
+                        <Grid ColumnDefinitions="4,*"
+                              Margin="0,4"
+                              Opacity="{Binding ItemOpacity}"
+                              Cursor="Hand"
+                              Tag="{Binding}"
+                              PointerEntered="OnItemPointerEntered"
+                              PointerPressed="OnItemPointerPressed">
+
+                            <!-- Barre accent gauche -->
+                            <Border Grid.Column="0"
+                                    Background="{Binding AccentBrush}"
+                                    CornerRadius="2,0,0,2"/>
+
+                            <!-- Corps de l'item -->
+                            <Border Grid.Column="1"
+                                    Background="{Binding BackgroundBrush}"
+                                    BoxShadow="{Binding SelectionGlow}"
+                                    Padding="18,0"
+                                    Height="50"
+                                    CornerRadius="0,3,3,0">
+                                <Border.Transitions>
+                                    <Transitions>
+                                        <BoxShadowsTransition Property="BoxShadow" Duration="0:0:0.25"/>
+                                        <BrushTransition Property="Background" Duration="0:0:0.25"/>
+                                    </Transitions>
+                                </Border.Transitions>
+
+                                <Grid ColumnDefinitions="16,*">
+                                    <!-- Flèche de sélection -->
+                                    <TextBlock Grid.Column="0"
+                                               Text="▶"
+                                               Foreground="{Binding AccentBrush}"
+                                               FontSize="11"
+                                               VerticalAlignment="Center"
+                                               IsVisible="{Binding IsSelected}"/>
+                                    <!-- Label -->
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding Label}"
+                                               Foreground="{Binding ForegroundBrush}"
+                                               FontWeight="{Binding ItemFontWeight}"
+                                               FontFamily="Courier New"
+                                               FontSize="15"
+                                               LetterSpacing="1"
+                                               VerticalAlignment="Center">
+                                        <TextBlock.Transitions>
+                                            <Transitions>
+                                                <BrushTransition Property="Foreground" Duration="0:0:0.2"/>
+                                            </Transitions>
+                                        </TextBlock.Transitions>
+                                    </TextBlock>
+                                </Grid>
+                            </Border>
+
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- Footer -->
+            <StackPanel Grid.Row="2" Spacing="6" Margin="0,22,0,20" HorizontalAlignment="Center">
+                <Rectangle Height="1" Width="200">
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                            <GradientStop Color="#00222244" Offset="0"/>
+                            <GradientStop Color="#88222244" Offset="0.5"/>
+                            <GradientStop Color="#00222244" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+                <TextBlock Text="↑ ↓  NAVIGUER   ·   ENTRÉE  CONFIRMER"
+                           Foreground="#1f1f3a"
+                           FontFamily="Courier New"
+                           FontSize="10"
+                           LetterSpacing="1"
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+
+        </Grid>
+    </Grid>
+
+</UserControl>
