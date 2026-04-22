@@ -12,4 +12,7 @@ public class BoardState
 
     public Tetromino? NextPiece { get; set; }
     public bool IsGameOver { get; set; }
+
+    public int Score { get; set; }
+    public int LinesCleared { get; set; }
 }

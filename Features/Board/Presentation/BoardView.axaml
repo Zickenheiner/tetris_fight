@@ -50,7 +50,7 @@
             </Border>
         </Grid>
 
-        <!-- Panneau latéral : pièce suivante -->
+        <!-- Panneau latéral : pièce suivante + score + lignes -->
         <StackPanel Grid.Column="1" Margin="16,0,8,0" Width="120">
             <TextBlock Text="SUIVANT"
                        Foreground="#aaaacc" FontSize="12" FontWeight="Bold" LetterSpacing="2"
@@ -70,6 +70,22 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+
+            <!-- Score -->
+            <TextBlock Text="SCORE"
+                       Foreground="#aaaacc" FontSize="12" FontWeight="Bold" LetterSpacing="2"
+                       HorizontalAlignment="Center" Margin="0,24,0,4"/>
+            <TextBlock Text="{Binding Score}"
+                       Foreground="#ffffff" FontSize="18" FontWeight="Bold"
+                       HorizontalAlignment="Center"/>
+
+            <!-- Lignes -->
+            <TextBlock Text="LIGNES"
+                       Foreground="#aaaacc" FontSize="12" FontWeight="Bold" LetterSpacing="2"
+                       HorizontalAlignment="Center" Margin="0,16,0,4"/>
+            <TextBlock Text="{Binding LinesCleared}"
+                       Foreground="#ffffff" FontSize="18" FontWeight="Bold"
+                       HorizontalAlignment="Center"/>
         </StackPanel>
 
     </Grid>

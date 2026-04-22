@@ -25,6 +25,20 @@ public class BoardViewModel : INotifyPropertyChanged
         private set { _isGameOver = value; OnPropertyChanged(); }
     }
 
+    private int _score;
+    public int Score
+    {
+        get => _score;
+        private set { _score = value; OnPropertyChanged(); }
+    }
+
+    private int _linesCleared;
+    public int LinesCleared
+    {
+        get => _linesCleared;
+        private set { _linesCleared = value; OnPropertyChanged(); }
+    }
+
     public event Action? ReturnToMenuRequested;
     public event PropertyChangedEventHandler? PropertyChanged;
     private void OnPropertyChanged([CallerMemberName] string? name = null)
@@ -97,6 +111,10 @@ public class BoardViewModel : INotifyPropertyChanged
         state.IsGameOver = false;
         state.CurrentPiece = null;
         state.NextPiece = null;
+        state.Score = 0;
+        state.LinesCleared = 0;
+        Score = 0;
+        LinesCleared = 0;
         for (int r = 0; r < BoardState.Rows; r++)
             for (int c = 0; c < BoardState.Cols; c++)
                 state.Grid[r, c] = null;
@@ -107,6 +125,8 @@ public class BoardViewModel : INotifyPropertyChanged
     private void RefreshGrid()
     {
         var state = _boardService.State;
+        Score = state.Score;
+        LinesCleared = state.LinesCleared;
 
         for (int r = 0; r < BoardState.Rows; r++)
             for (int c = 0; c < BoardState.Cols; c++)

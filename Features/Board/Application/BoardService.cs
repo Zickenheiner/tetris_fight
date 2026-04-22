@@ -121,8 +121,11 @@ public class BoardService : IBoardService
         return true;
     }
 
+    private static readonly int[] LineScores = { 0, 100, 300, 500, 800 };
+
     private void ClearFullLines()
     {
+        int cleared = 0;
         for (int r = BoardState.Rows - 1; r >= 0; r--)
         {
             if (!Enumerable.Range(0, BoardState.Cols).All(c => State.Grid[r, c] is not null))
@@ -136,6 +139,13 @@ public class BoardService : IBoardService
                 State.Grid[0, c] = null;
 
             r++;
+            cleared++;
+        }
+
+        if (cleared > 0)
+        {
+            State.LinesCleared += cleared;
+            State.Score += LineScores[Math.Min(cleared, 4)];
         }
     }
 

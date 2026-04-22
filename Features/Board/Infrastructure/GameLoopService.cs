@@ -20,6 +20,7 @@ public class GameLoopService
     public void Start()
     {
         _tickCount = 0;
+        _timer.Interval = TimeSpan.FromMilliseconds(500);
         _boardService.SpawnPiece();
         _timer.Start();
     }
