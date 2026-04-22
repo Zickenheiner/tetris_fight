@@ -14,6 +14,7 @@ public class GameLoopService
         _boardService = boardService;
         _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
         _timer.Tick += OnTick;
+        _boardService.GameOver += Stop;
     }
 
     public void Start()

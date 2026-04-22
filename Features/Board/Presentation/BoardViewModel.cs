@@ -1,11 +1,15 @@
 namespace tetris_fight.Features.Board.Presentation;
 
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Avalonia.Input;
+using Avalonia.Media;
+using Avalonia.Threading;
 using tetris_fight.Features.Board.Application;
 using tetris_fight.Features.Board.Domain;
 using tetris_fight.Features.Board.Infrastructure;
 
-public class BoardViewModel
+public class BoardViewModel : INotifyPropertyChanged
 {
     private readonly IBoardService _boardService;
     private readonly GameLoopService _gameLoop;
@@ -13,6 +17,17 @@ public class BoardViewModel
     public CellViewModel[] Cells { get; }
     public CellViewModel[] NextPieceCells { get; }
     public bool ShowGhost { get; private set; } = true;
+
+    private bool _isGameOver;
+    public bool IsGameOver
+    {
+        get => _isGameOver;
+        private set { _isGameOver = value; OnPropertyChanged(); }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+    private void OnPropertyChanged([CallerMemberName] string? name = null)
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
     public BoardViewModel()
     {
@@ -28,11 +43,37 @@ public class BoardViewModel
                                    .ToArray();
 
         _boardService.StateChanged += RefreshGrid;
+        _boardService.GameOver += StartGameOverAnimation;
         _gameLoop.Start();
+    }
+
+    private void StartGameOverAnimation()
+    {
+        int currentRow = BoardState.Rows - 1;
+        var animBrush = new SolidColorBrush(Color.Parse("#882222"));
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(60) };
+        timer.Tick += (_, _) =>
+        {
+            if (currentRow < 0)
+            {
+                timer.Stop();
+                IsGameOver = true;
+                return;
+            }
+            for (int c = 0; c < BoardState.Cols; c++)
+                Cells[currentRow * BoardState.Cols + c].Background = animBrush;
+            currentRow--;
+        };
+        timer.Start();
     }
 
     public void HandleKey(Key key)
     {
+        if (IsGameOver)
+        {
+            if (key == Key.R) Restart();
+            return;
+        }
         switch (key)
         {
             case Key.Left:  _boardService.TryMoveLeft(); break;
@@ -42,6 +83,22 @@ public class BoardViewModel
             case Key.Down:  _boardService.HardDrop(); break;
             case Key.G:     ShowGhost = !ShowGhost; RefreshGrid(); break;
         }
+    }
+
+    private void Restart()
+    {
+        _gameLoop.Stop();
+        IsGameOver = false;
+
+        var state = _boardService.State;
+        state.IsGameOver = false;
+        state.CurrentPiece = null;
+        state.NextPiece = null;
+        for (int r = 0; r < BoardState.Rows; r++)
+            for (int c = 0; c < BoardState.Cols; c++)
+                state.Grid[r, c] = null;
+
+        _gameLoop.Start();
     }
 
     private void RefreshGrid()

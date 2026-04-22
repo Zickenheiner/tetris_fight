@@ -8,19 +8,30 @@ public class BoardService : IBoardService
 
     public BoardState State { get; } = new();
     public event Action? StateChanged;
+    public event Action? GameOver;
 
     public void SpawnPiece()
     {
+        if (State.IsGameOver) return;
         var piece = State.NextPiece ?? CreateRandom();
         State.NextPiece = CreateRandom();
+        var startPos = new Point(0, (BoardState.Cols - piece.BoundingBoxSize) / 2);
+
+        if (!IsValid(piece, startPos))
+        {
+            State.IsGameOver = true;
+            GameOver?.Invoke();
+            return;
+        }
+
         State.CurrentPiece = piece;
-        State.CurrentPosition = new Point(0, (BoardState.Cols - piece.BoundingBoxSize) / 2);
+        State.CurrentPosition = startPos;
         StateChanged?.Invoke();
     }
 
     public bool TryMoveDown()
     {
-        if (State.CurrentPiece is null) return false;
+        if (State.IsGameOver || State.CurrentPiece is null) return false;
 
         var next = State.CurrentPosition with { Row = State.CurrentPosition.Row + 1 };
         if (!IsValid(State.CurrentPiece, next)) return false;
@@ -32,7 +43,7 @@ public class BoardService : IBoardService
 
     public bool TryMoveLeft()
     {
-        if (State.CurrentPiece is null) return false;
+        if (State.IsGameOver || State.CurrentPiece is null) return false;
         var next = State.CurrentPosition with { Col = State.CurrentPosition.Col - 1 };
         if (!IsValid(State.CurrentPiece, next)) return false;
         State.CurrentPosition = next;
@@ -42,7 +53,7 @@ public class BoardService : IBoardService
 
     public bool TryMoveRight()
     {
-        if (State.CurrentPiece is null) return false;
+        if (State.IsGameOver || State.CurrentPiece is null) return false;
         var next = State.CurrentPosition with { Col = State.CurrentPosition.Col + 1 };
         if (!IsValid(State.CurrentPiece, next)) return false;
         State.CurrentPosition = next;
@@ -52,7 +63,7 @@ public class BoardService : IBoardService
 
     public bool TryRotate(bool clockwise)
     {
-        if (State.CurrentPiece is null) return false;
+        if (State.IsGameOver || State.CurrentPiece is null) return false;
         var rotated = clockwise ? State.CurrentPiece.RotateClockwise() : State.CurrentPiece.RotateCounterClockwise();
         if (!IsValid(rotated, State.CurrentPosition)) return false;
         State.CurrentPiece = rotated;
@@ -62,7 +73,7 @@ public class BoardService : IBoardService
 
     public void HardDrop()
     {
-        if (State.CurrentPiece is null) return;
+        if (State.IsGameOver || State.CurrentPiece is null) return;
         while (true)
         {
             var next = State.CurrentPosition with { Row = State.CurrentPosition.Row + 1 };

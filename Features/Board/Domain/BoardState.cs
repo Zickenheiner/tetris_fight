@@ -11,4 +11,5 @@ public class BoardState
     public Point CurrentPosition { get; set; }
 
     public Tetromino? NextPiece { get; set; }
+    public bool IsGameOver { get; set; }
 }

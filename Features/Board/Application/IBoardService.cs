@@ -14,4 +14,5 @@ public interface IBoardService
     void LockPiece();
     int GetGhostRow();
     event Action? StateChanged;
+    event Action? GameOver;
 }

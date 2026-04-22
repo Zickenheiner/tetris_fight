@@ -7,23 +7,44 @@
     <Grid ColumnDefinitions="Auto,Auto" Background="#0d0d1a"
           HorizontalAlignment="Center" VerticalAlignment="Center">
 
-        <!-- Plateau de jeu 10×20 -->
-        <Border Grid.Column="0" BorderBrush="#2a2a5a" BorderThickness="2">
-            <ItemsControl ItemsSource="{Binding Cells}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <UniformGrid Rows="20" Columns="10"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="vm:CellViewModel">
-                        <Border Background="{Binding Background}"
-                                Width="30" Height="30"
-                                BorderBrush="#1a1a3a" BorderThickness="1"/>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </Border>
+        <!-- Plateau de jeu 10×20 avec overlay game over -->
+        <Grid Grid.Column="0">
+            <Border BorderBrush="#2a2a5a" BorderThickness="2">
+                <ItemsControl ItemsSource="{Binding Cells}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Rows="20" Columns="10"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:CellViewModel">
+                            <Border Background="{Binding Background}"
+                                    Width="30" Height="30"
+                                    BorderBrush="#1a1a3a" BorderThickness="1"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Border>
+
+            <!-- Overlay DÉFAITE -->
+            <Border IsVisible="{Binding IsGameOver}"
+                    Background="#CC000000"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
+                    <TextBlock Text="DÉFAITE"
+                               Foreground="#FF4444"
+                               FontSize="36"
+                               FontWeight="Bold"
+                               LetterSpacing="4"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Appuyez sur R pour rejouer"
+                               Foreground="#888899"
+                               FontSize="13"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </Grid>
 
         <!-- Panneau latéral : pièce suivante -->
         <StackPanel Grid.Column="1" Margin="16,0,8,0" Width="120">
