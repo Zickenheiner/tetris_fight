@@ -33,11 +33,10 @@
                                     CornerRadius="3"
                                     VerticalAlignment="Bottom"/>
                             <Border Margin="2"
-                                    Height="520"
+                                    Height="{Binding LocalBoard.SabotageBarHeight}"
                                     VerticalAlignment="Bottom"
                                     CornerRadius="3"
-                                    Opacity="0.95"
-                                    RenderTransformOrigin="0.5,1">
+                                    Opacity="0.95">
                                 <Border.Background>
                                     <LinearGradientBrush StartPoint="0%,100%" EndPoint="0%,0%">
                                         <GradientStop Color="#146B7A" Offset="0"/>
@@ -45,33 +44,24 @@
                                         <GradientStop Color="#8FF6FF" Offset="1"/>
                                     </LinearGradientBrush>
                                 </Border.Background>
-                                <Border.RenderTransform>
-                                    <ScaleTransform ScaleY="{Binding LocalBoard.SabotageGaugePercent}">
-                                        <ScaleTransform.Transitions>
-                                            <Transitions>
-                                                <DoubleTransition Property="ScaleY" Duration="0:0:0.24"/>
-                                            </Transitions>
-                                        </ScaleTransform.Transitions>
-                                    </ScaleTransform>
-                                </Border.RenderTransform>
+                                <Border.Transitions>
+                                    <Transitions>
+                                        <DoubleTransition Property="Height" Duration="0:0:0.24"/>
+                                    </Transitions>
+                                </Border.Transitions>
                             </Border>
                             <Border Margin="4,4,4,6"
-                                    Height="514"
+                                    Height="{Binding LocalBoard.SabotageBarHeight}"
                                     VerticalAlignment="Bottom"
                                     Background="#66E8FDFF"
                                     CornerRadius="2"
                                     Opacity="0.8"
-                                    IsHitTestVisible="False"
-                                    RenderTransformOrigin="0.5,1">
-                                <Border.RenderTransform>
-                                    <ScaleTransform ScaleY="{Binding LocalBoard.SabotageGaugePercent}">
-                                        <ScaleTransform.Transitions>
-                                            <Transitions>
-                                                <DoubleTransition Property="ScaleY" Duration="0:0:0.24"/>
-                                            </Transitions>
-                                        </ScaleTransform.Transitions>
-                                    </ScaleTransform>
-                                </Border.RenderTransform>
+                                    IsHitTestVisible="False">
+                                <Border.Transitions>
+                                    <Transitions>
+                                        <DoubleTransition Property="Height" Duration="0:0:0.24"/>
+                                    </Transitions>
+                                </Border.Transitions>
                             </Border>
                         </Grid>
 
@@ -221,11 +211,10 @@
                                     CornerRadius="3"
                                     VerticalAlignment="Bottom"/>
                             <Border Margin="2"
-                                    Height="520"
+                                    Height="{Binding OpponentBoard.SabotageBarHeight}"
                                     VerticalAlignment="Bottom"
                                     CornerRadius="3"
-                                    Opacity="0.95"
-                                    RenderTransformOrigin="0.5,1">
+                                    Opacity="0.95">
                                 <Border.Background>
                                     <LinearGradientBrush StartPoint="0%,100%" EndPoint="0%,0%">
                                         <GradientStop Color="#146B7A" Offset="0"/>
@@ -233,33 +222,24 @@
                                         <GradientStop Color="#8FF6FF" Offset="1"/>
                                     </LinearGradientBrush>
                                 </Border.Background>
-                                <Border.RenderTransform>
-                                    <ScaleTransform ScaleY="{Binding OpponentBoard.SabotageGaugePercent}">
-                                        <ScaleTransform.Transitions>
-                                            <Transitions>
-                                                <DoubleTransition Property="ScaleY" Duration="0:0:0.24"/>
-                                            </Transitions>
-                                        </ScaleTransform.Transitions>
-                                    </ScaleTransform>
-                                </Border.RenderTransform>
+                                <Border.Transitions>
+                                    <Transitions>
+                                        <DoubleTransition Property="Height" Duration="0:0:0.24"/>
+                                    </Transitions>
+                                </Border.Transitions>
                             </Border>
                             <Border Margin="4,4,4,6"
-                                    Height="514"
+                                    Height="{Binding OpponentBoard.SabotageBarHeight}"
                                     VerticalAlignment="Bottom"
                                     Background="#66E8FDFF"
                                     CornerRadius="2"
                                     Opacity="0.8"
-                                    IsHitTestVisible="False"
-                                    RenderTransformOrigin="0.5,1">
-                                <Border.RenderTransform>
-                                    <ScaleTransform ScaleY="{Binding OpponentBoard.SabotageGaugePercent}">
-                                        <ScaleTransform.Transitions>
-                                            <Transitions>
-                                                <DoubleTransition Property="ScaleY" Duration="0:0:0.24"/>
-                                            </Transitions>
-                                        </ScaleTransform.Transitions>
-                                    </ScaleTransform>
-                                </Border.RenderTransform>
+                                    IsHitTestVisible="False">
+                                <Border.Transitions>
+                                    <Transitions>
+                                        <DoubleTransition Property="Height" Duration="0:0:0.24"/>
+                                    </Transitions>
+                                </Border.Transitions>
                             </Border>
                         </Grid>
                         <Border IsVisible="{Binding OpponentBoard.IsGaugeFull}"
