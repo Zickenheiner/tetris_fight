@@ -126,6 +126,9 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
         _localDead = true;
         _localDeathScore = _localService.State.Score;
 
+        // BoardService ne déclenche pas StateChanged après GameOver — on envoie le snapshot final manuellement
+        _network.SendBoard(BuildSnapshot(_localService.State));
+
         if (_opponentDead)
         {
             EndMatch(_localDeathScore.CompareTo(_opponentDeathScore));
