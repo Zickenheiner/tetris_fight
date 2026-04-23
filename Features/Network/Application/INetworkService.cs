@@ -21,6 +21,7 @@ public interface INetworkService : IDisposable
     event Action? Disconnected;
     event Action<BoardSnapshot>? OpponentBoardReceived;
     event Action<int>? PingUpdated;
+    int? ReceivedSeed { get; }
     event Action<int>? SeedReceived;
     event Action<TetrominoType>? SabotageReceived;
     event Action<string>? PlayerNameReceived;
