@@ -145,6 +145,7 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
     {
         _localService.StateChanged -= OnLocalStateChanged;
         _network.SeedReceived -= OnSeedReceived;
+        LocalBoard.Dispose();
         _network.Dispose();
     }
 
