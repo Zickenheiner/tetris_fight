@@ -6,14 +6,14 @@ using tetris_fight.Features.Network.Infrastructure;
 
 public partial class HostLobbyView : UserControl
 {
-    public event Action<TcpNetworkService, bool>? GameReady;
+    public event Action<TcpNetworkService, string, bool>? GameReady;
     public event Action? ReturnToMenuRequested;
 
     public HostLobbyView()
     {
         InitializeComponent();
         var vm = new HostLobbyViewModel();
-        vm.GameReady += svc => GameReady?.Invoke(svc, true);
+        vm.GameReady += (svc, pseudo) => GameReady?.Invoke(svc, pseudo, true);
         vm.ReturnToMenuRequested += () => ReturnToMenuRequested?.Invoke();
         DataContext = vm;
     }

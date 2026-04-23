@@ -4,36 +4,41 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using tetris_fight.Features.Network.Infrastructure;
 
-public partial class JoinView : UserControl
+public partial class LobbyReadyView : UserControl
 {
-    public event Action<TcpNetworkService, string, bool>? GameReady;
+    public event Action<TcpNetworkService, bool>? GameReady;
     public event Action? ReturnToMenuRequested;
 
-    public JoinView()
+    public LobbyReadyView()
     {
         InitializeComponent();
-        var vm = new JoinViewModel();
-        vm.GameReady += (svc, pseudo) => GameReady?.Invoke(svc, pseudo, false);
+    }
+
+    public LobbyReadyView(TcpNetworkService network, string myPseudo, bool isHost)
+        : this()
+    {
+        var vm = new LobbyReadyViewModel(network, myPseudo, isHost);
+        vm.GameReady += (svc, host) => GameReady?.Invoke(svc, host);
         vm.ReturnToMenuRequested += () => ReturnToMenuRequested?.Invoke();
         DataContext = vm;
     }
 
-    private void OnConnectClick(object? sender, RoutedEventArgs e)
+    private void OnReadyClick(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is JoinViewModel vm)
-            vm.Connect();
+        if (DataContext is LobbyReadyViewModel vm)
+            vm.SetReady();
     }
 
     private void OnCancelClick(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is JoinViewModel vm)
+        if (DataContext is LobbyReadyViewModel vm)
             vm.Cancel();
     }
 
     protected override void OnDetachedFromVisualTree(Avalonia.VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
-        if (DataContext is JoinViewModel vm)
+        if (DataContext is LobbyReadyViewModel vm)
             vm.Dispose();
     }
 }

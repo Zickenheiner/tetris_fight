@@ -1,0 +1,353 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:tetris_fight.Features.Network.Presentation"
+             x:Class="tetris_fight.Features.Network.Presentation.LobbyReadyView"
+             x:DataType="vm:LobbyReadyViewModel"
+             Width="460" Height="660">
+
+    <UserControl.Styles>
+
+        <!-- Anneau pulsant lent (extérieur) -->
+        <Style Selector="Border.ring-slow">
+            <Style.Animations>
+                <Animation Duration="0:0:2.2" IterationCount="INFINITE" PlaybackDirection="Alternate">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Opacity" Value="0.05"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Opacity" Value="0.5"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+
+        <!-- Anneau pulsant rapide (intérieur) -->
+        <Style Selector="Border.ring-fast">
+            <Style.Animations>
+                <Animation Duration="0:0:1.1" IterationCount="INFINITE" PlaybackDirection="Alternate">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Opacity" Value="0.2"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Opacity" Value="0.9"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+
+        <!-- Lueur de fond pulsante -->
+        <Style Selector="Border.glow-bg">
+            <Style.Animations>
+                <Animation Duration="0:0:1.6" IterationCount="INFINITE" PlaybackDirection="Alternate">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Opacity" Value="0.4"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Opacity" Value="1.0"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+
+        <!-- Lueur bouton prêt -->
+        <Style Selector="Border.ready-btn-glow">
+            <Style.Animations>
+                <Animation Duration="0:0:1.8" IterationCount="INFINITE" PlaybackDirection="Alternate">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Opacity" Value="0.3"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Opacity" Value="0.9"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+
+    </UserControl.Styles>
+
+    <UserControl.Background>
+        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#04040c" Offset="0"/>
+            <GradientStop Color="#07071a" Offset="0.5"/>
+            <GradientStop Color="#04040c" Offset="1"/>
+        </LinearGradientBrush>
+    </UserControl.Background>
+
+    <Grid>
+
+        <!-- ─── Contenu principal du lobby ─── -->
+        <Grid RowDefinitions="*,Auto,*" Width="400" HorizontalAlignment="Center">
+
+            <!-- Titre -->
+            <StackPanel Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                        Spacing="0" Margin="0,0,0,36">
+                <Border BoxShadow="0 0 60 16 #4400F0F0" HorizontalAlignment="Center" Padding="8,0">
+                    <TextBlock Text="SALLE"
+                               Foreground="#00F0F0" FontFamily="Courier New"
+                               FontWeight="Black" FontSize="42" LetterSpacing="8"
+                               HorizontalAlignment="Center"/>
+                </Border>
+                <Border BoxShadow="0 0 60 16 #44F0A000" HorizontalAlignment="Center"
+                        Padding="8,0" Margin="0,-6,0,0">
+                    <TextBlock Text="D'ATTENTE"
+                               Foreground="#F0A000" FontFamily="Courier New"
+                               FontWeight="Black" FontSize="42" LetterSpacing="8"
+                               HorizontalAlignment="Center"/>
+                </Border>
+            </StackPanel>
+
+            <!-- Joueurs + bouton -->
+            <StackPanel Grid.Row="1" Spacing="12" HorizontalAlignment="Center" Width="400">
+
+                <!-- Carte joueur local -->
+                <Border CornerRadius="6" Padding="0" ClipToBounds="True">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                            <GradientStop Color="#0d1a2e" Offset="0"/>
+                            <GradientStop Color="#091222" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <Grid ColumnDefinitions="4,*,Auto">
+                        <!-- Accent gauche cyan -->
+                        <Border Grid.Column="0" Background="#00F0F0" CornerRadius="0"/>
+                        <StackPanel Grid.Column="1" Spacing="3" Margin="16,14,16,14">
+                            <TextBlock Text="TOI"
+                                       Foreground="#446688" FontFamily="Courier New"
+                                       FontSize="10" LetterSpacing="3"/>
+                            <Border BoxShadow="0 0 16 4 #5500F0F0">
+                                <TextBlock Text="{Binding MyPseudo}"
+                                           Foreground="#00F0F0" FontFamily="Courier New"
+                                           FontSize="22" FontWeight="Bold" LetterSpacing="1"/>
+                            </Border>
+                        </StackPanel>
+                        <!-- Statut -->
+                        <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="0,0,16,0">
+                            <Border IsVisible="{Binding MyReady}"
+                                    Background="#0a2010" BorderBrush="#00C040" BorderThickness="1"
+                                    CornerRadius="3" Padding="10,5">
+                                <TextBlock Text="✔  PRÊT"
+                                           Foreground="#00F060" FontFamily="Courier New"
+                                           FontSize="12" FontWeight="Bold" LetterSpacing="1"/>
+                            </Border>
+                            <Border IsVisible="{Binding !MyReady}"
+                                    Background="#0a0a1e" BorderBrush="#1a1a4a" BorderThickness="1"
+                                    CornerRadius="3" Padding="10,5">
+                                <TextBlock Text="ATTENTE"
+                                           Foreground="#333360" FontFamily="Courier New"
+                                           FontSize="12" LetterSpacing="1"/>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Séparateur VS -->
+                <Grid ColumnDefinitions="*,Auto,*" Margin="0,4,0,4">
+                    <Border Grid.Column="0" Height="1" VerticalAlignment="Center">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                                <GradientStop Color="Transparent" Offset="0"/>
+                                <GradientStop Color="#222244" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                    </Border>
+                    <Border Grid.Column="1"
+                            Background="#09090f" BorderBrush="#1a1a3a" BorderThickness="1"
+                            CornerRadius="20" Padding="14,4">
+                        <TextBlock Text="VS"
+                                   Foreground="#2a2a5a" FontFamily="Courier New"
+                                   FontWeight="Black" FontSize="16" LetterSpacing="4"
+                                   HorizontalAlignment="Center"/>
+                    </Border>
+                    <Border Grid.Column="2" Height="1" VerticalAlignment="Center">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                                <GradientStop Color="#222244" Offset="0"/>
+                                <GradientStop Color="Transparent" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                    </Border>
+                </Grid>
+
+                <!-- Carte joueur adversaire -->
+                <Border CornerRadius="6" Padding="0" ClipToBounds="True">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                            <GradientStop Color="#1a0d2e" Offset="0"/>
+                            <GradientStop Color="#120922" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <Grid ColumnDefinitions="4,*,Auto">
+                        <!-- Accent gauche violet -->
+                        <Border Grid.Column="0" Background="#A000F0" CornerRadius="0"/>
+                        <StackPanel Grid.Column="1" Spacing="3" Margin="16,14,16,14">
+                            <TextBlock Text="ADVERSAIRE"
+                                       Foreground="#442266" FontFamily="Courier New"
+                                       FontSize="10" LetterSpacing="3"/>
+                            <Border BoxShadow="0 0 16 4 #55A000F0">
+                                <TextBlock Text="{Binding OpponentPseudo}"
+                                           Foreground="#A000F0" FontFamily="Courier New"
+                                           FontSize="22" FontWeight="Bold" LetterSpacing="1"/>
+                            </Border>
+                        </StackPanel>
+                        <!-- Statut -->
+                        <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="0,0,16,0">
+                            <Border IsVisible="{Binding OpponentReady}"
+                                    Background="#0a2010" BorderBrush="#00C040" BorderThickness="1"
+                                    CornerRadius="3" Padding="10,5">
+                                <TextBlock Text="✔  PRÊT"
+                                           Foreground="#00F060" FontFamily="Courier New"
+                                           FontSize="12" FontWeight="Bold" LetterSpacing="1"/>
+                            </Border>
+                            <Border IsVisible="{Binding !OpponentReady}"
+                                    Background="#0a0a1e" BorderBrush="#1a1a4a" BorderThickness="1"
+                                    CornerRadius="3" Padding="10,5">
+                                <TextBlock Text="ATTENTE"
+                                           Foreground="#333360" FontFamily="Courier New"
+                                           FontSize="12" LetterSpacing="1"/>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Bouton PRÊT avec lueur animée -->
+                <Grid Margin="0,12,0,0">
+                    <!-- Glow derrière le bouton (animé) -->
+                    <Border Classes="ready-btn-glow"
+                            IsVisible="{Binding CanClickReady}"
+                            CornerRadius="4"
+                            BoxShadow="0 0 30 8 #6600C040"
+                            Background="Transparent"/>
+                    <Button Content="JE SUIS PRÊT !"
+                            IsEnabled="{Binding CanClickReady}"
+                            FontFamily="Courier New"
+                            FontSize="18" FontWeight="Bold" LetterSpacing="4"
+                            Padding="0,18"
+                            CornerRadius="4"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            Cursor="Hand"
+                            Click="OnReadyClick">
+                        <Button.Background>
+                            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                                <GradientStop Color="#081a0a" Offset="0"/>
+                                <GradientStop Color="#0c2410" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Button.Background>
+                        <Button.Foreground>
+                            <SolidColorBrush Color="#00F060"/>
+                        </Button.Foreground>
+                        <Button.BorderBrush>
+                            <SolidColorBrush Color="#00B040"/>
+                        </Button.BorderBrush>
+                        <Button.BorderThickness>
+                            <Thickness>1</Thickness>
+                        </Button.BorderThickness>
+                    </Button>
+                </Grid>
+
+            </StackPanel>
+
+            <!-- Bouton retour -->
+            <StackPanel Grid.Row="2" VerticalAlignment="Top" Margin="0,28,0,0"
+                        HorizontalAlignment="Center">
+                <Button Content="← RETOUR AU MENU"
+                        Background="Transparent"
+                        Foreground="#2a2a55"
+                        BorderThickness="0"
+                        FontFamily="Courier New"
+                        FontSize="13" LetterSpacing="1"
+                        Cursor="Hand"
+                        Click="OnCancelClick"/>
+            </StackPanel>
+
+        </Grid>
+
+        <!-- ─── Overlay compte à rebours ─── -->
+        <Grid IsVisible="{Binding IsCountdownVisible}"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch">
+
+            <!-- Fond sombre -->
+            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%">
+                        <GradientStop Color="#EE020208" Offset="0"/>
+                        <GradientStop Color="#F4030312" Offset="0.5"/>
+                        <GradientStop Color="#EE020208" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+
+            <!-- Anneau extérieur lent -->
+            <Border Classes="ring-slow"
+                    Width="420" Height="420" CornerRadius="210"
+                    BorderBrush="#00F0F0" BorderThickness="1"
+                    Background="Transparent"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+            <!-- Anneau médian -->
+            <Border Classes="ring-fast"
+                    Width="350" Height="350" CornerRadius="175"
+                    BorderBrush="#00F0F0" BorderThickness="1"
+                    Background="Transparent"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+            <!-- Anneau intérieur rapide -->
+            <Border Classes="ring-slow"
+                    Width="280" Height="280" CornerRadius="140"
+                    BorderBrush="#00F0F0" BorderThickness="2"
+                    Background="Transparent"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+            <!-- Disque central avec lueur -->
+            <Border Classes="glow-bg"
+                    Width="240" Height="240" CornerRadius="120"
+                    BoxShadow="0 0 70 18 #AA00F0F0"
+                    Background="Transparent"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+            <!-- Contenu centré : label + chiffre -->
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="0">
+
+                <!-- Label "COMBAT DANS" (visible seulement pour 1-3) -->
+                <TextBlock Text="COMBAT DANS"
+                           IsVisible="{Binding !IsShowingGo}"
+                           Foreground="#334466" FontFamily="Courier New"
+                           FontSize="11" LetterSpacing="5"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,8"/>
+
+                <!-- Le grand chiffre / GO! -->
+                <Border Width="220" Height="220" CornerRadius="110"
+                        Background="#10000020">
+                    <TextBlock Text="{Binding CountdownText}"
+                               Foreground="{Binding CountdownBrush}"
+                               Opacity="{Binding CountdownOpacity}"
+                               FontFamily="Courier New"
+                               FontWeight="Black"
+                               FontSize="130"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center">
+                        <TextBlock.Transitions>
+                            <Transitions>
+                                <DoubleTransition Property="Opacity" Duration="0:0:0.14"/>
+                            </Transitions>
+                        </TextBlock.Transitions>
+                    </TextBlock>
+                </Border>
+
+                <!-- Sous-label (visible seulement pour GO!) -->
+                <TextBlock Text="BONNE CHANCE !"
+                           IsVisible="{Binding IsShowingGo}"
+                           Foreground="#334422" FontFamily="Courier New"
+                           FontSize="11" LetterSpacing="4"
+                           HorizontalAlignment="Center"
+                           Margin="0,10,0,0"/>
+
+            </StackPanel>
+
+        </Grid>
+
+    </Grid>
+
+</UserControl>

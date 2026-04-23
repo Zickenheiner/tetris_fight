@@ -13,6 +13,9 @@ public interface INetworkService : IDisposable
     void SendBoard(BoardSnapshot snapshot);
     void SendSeed(int seed);
     void SendSabotage(TetrominoType type);
+    void SendPlayerName(string name);
+    void SendReady();
+    void SendStartCountdown();
 
     event Action? Connected;
     event Action? Disconnected;
@@ -20,4 +23,7 @@ public interface INetworkService : IDisposable
     event Action<int>? PingUpdated;
     event Action<int>? SeedReceived;
     event Action<TetrominoType>? SabotageReceived;
+    event Action<string>? PlayerNameReceived;
+    event Action? ReadyReceived;
+    event Action? StartCountdownReceived;
 }

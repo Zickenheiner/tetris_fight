@@ -36,6 +36,23 @@
         <StackPanel Grid.Row="1" Spacing="20" HorizontalAlignment="Center" Width="320">
 
             <StackPanel Spacing="8">
+                <TextBlock Text="TON PSEUDO"
+                           Foreground="#aaaacc" FontFamily="Courier New"
+                           FontSize="11" LetterSpacing="2"/>
+                <TextBox Text="{Binding Pseudo}"
+                         PlaceholderText="ex: TetrisMaster"
+                         Background="#0a0a1e"
+                         Foreground="#A000F0"
+                         BorderBrush="#2a2a5a"
+                         BorderThickness="1"
+                         FontFamily="Courier New"
+                         FontSize="18"
+                         Padding="12,8"
+                         CornerRadius="4"
+                         MaxLength="16"/>
+            </StackPanel>
+
+            <StackPanel Spacing="8">
                 <TextBlock Text="ADRESSE IP DE L'HÔTE"
                            Foreground="#aaaacc" FontFamily="Courier New"
                            FontSize="11" LetterSpacing="2"/>

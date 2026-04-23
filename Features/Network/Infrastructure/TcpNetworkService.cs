@@ -33,6 +33,9 @@ public sealed class TcpNetworkService : INetworkService
     public event Action<int>? PingUpdated;
     public event Action<int>? SeedReceived;
     public event Action<TetrominoType>? SabotageReceived;
+    public event Action<string>? PlayerNameReceived;
+    public event Action? ReadyReceived;
+    public event Action? StartCountdownReceived;
 
     public async Task StartHostAsync(CancellationToken ct = default)
     {
@@ -73,6 +76,21 @@ public sealed class TcpNetworkService : INetworkService
     public void SendSabotage(TetrominoType type)
     {
         SendMessage(new NetworkMessage { Type = NetworkMessageType.Sabotage, Payload = ((int)type).ToString() });
+    }
+
+    public void SendPlayerName(string name)
+    {
+        SendMessage(new NetworkMessage { Type = NetworkMessageType.PlayerName, Payload = name });
+    }
+
+    public void SendReady()
+    {
+        SendMessage(new NetworkMessage { Type = NetworkMessageType.Ready });
+    }
+
+    public void SendStartCountdown()
+    {
+        SendMessage(new NetworkMessage { Type = NetworkMessageType.StartCountdown });
     }
 
     private void SetupStreams()
@@ -146,6 +164,18 @@ public sealed class TcpNetworkService : INetworkService
             case NetworkMessageType.Sabotage when msg.Payload is not null:
                 if (int.TryParse(msg.Payload, out int typeId) && Enum.IsDefined(typeof(TetrominoType), typeId))
                     Dispatcher.UIThread.Post(() => SabotageReceived?.Invoke((TetrominoType)typeId));
+                break;
+
+            case NetworkMessageType.PlayerName when msg.Payload is not null:
+                Dispatcher.UIThread.Post(() => PlayerNameReceived?.Invoke(msg.Payload));
+                break;
+
+            case NetworkMessageType.Ready:
+                Dispatcher.UIThread.Post(() => ReadyReceived?.Invoke());
+                break;
+
+            case NetworkMessageType.StartCountdown:
+                Dispatcher.UIThread.Post(() => StartCountdownReceived?.Invoke());
                 break;
         }
     }

@@ -22,6 +22,13 @@ public sealed class JoinViewModel : INotifyPropertyChanged, IDisposable
         }
     }
 
+    private string _pseudo = string.Empty;
+    public string Pseudo
+    {
+        get => _pseudo;
+        set { _pseudo = value; OnPropertyChanged(); }
+    }
+
     public bool CanConnect => !string.IsNullOrWhiteSpace(_ip) && !_isConnecting;
 
     private bool _isConnecting;
@@ -33,7 +40,7 @@ public sealed class JoinViewModel : INotifyPropertyChanged, IDisposable
         private set { _status = value; OnPropertyChanged(); }
     }
 
-    public event Action<TcpNetworkService>? GameReady;
+    public event Action<TcpNetworkService, string>? GameReady;
     public event Action? ReturnToMenuRequested;
 
     public async void Connect()
@@ -51,7 +58,7 @@ public sealed class JoinViewModel : INotifyPropertyChanged, IDisposable
             Status = "Connecté !";
             _networkTransferred = true;
             _network = null;
-            GameReady?.Invoke(network);
+            GameReady?.Invoke(network, string.IsNullOrWhiteSpace(_pseudo) ? "Joueur 2" : _pseudo.Trim());
         }
         catch (OperationCanceledException) { }
         catch
