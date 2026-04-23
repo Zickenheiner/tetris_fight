@@ -20,4 +20,5 @@ public interface IBoardService
     void ForcePiece(TetrominoType type);
     event Action? StateChanged;
     event Action? GameOver;
+    event Action<ForcedPieceAnimation>? ForcedPieceApplied;
 }

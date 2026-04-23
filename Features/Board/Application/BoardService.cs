@@ -10,6 +10,7 @@ public class BoardService : IBoardService
     public IReadOnlyList<int> LastClearedRows { get; private set; } = Array.Empty<int>();
     public event Action? StateChanged;
     public event Action? GameOver;
+    public event Action<ForcedPieceAnimation>? ForcedPieceApplied;
 
     public void SpawnPiece()
     {
@@ -185,12 +186,25 @@ public class BoardService : IBoardService
     {
         if (State.IsGameOver) return;
         var piece = new Tetromino(type);
-        var pos = State.CurrentPiece is not null && IsValid(piece, State.CurrentPosition)
+        var startPos = GetForcedPiecePosition(piece);
+        var landingPos = GetHardDropPosition(piece, startPos);
+        State.CurrentPiece = piece;
+        State.CurrentPosition = startPos;
+        HardDrop();
+        ForcedPieceApplied?.Invoke(new ForcedPieceAnimation(null, default, piece, landingPos));
+    }
+
+    private Point GetForcedPiecePosition(Tetromino piece) =>
+        State.CurrentPiece is not null && IsValid(piece, State.CurrentPosition)
             ? State.CurrentPosition
             : new Point(0, (BoardState.Cols - piece.BoundingBoxSize) / 2);
-        State.CurrentPiece = piece;
-        State.CurrentPosition = pos;
-        HardDrop();
+
+    private Point GetHardDropPosition(Tetromino piece, Point startPos)
+    {
+        int row = startPos.Row;
+        while (IsValid(piece, new Point(row + 1, startPos.Col)))
+            row++;
+        return new Point(row, startPos.Col);
     }
 
     public void SetSeed(int seed)
