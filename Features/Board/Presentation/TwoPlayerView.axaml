@@ -36,7 +36,8 @@
                                         Background="Transparent"
                                         BorderBrush="#2a2a5a" BorderThickness="1"
                                         CornerRadius="2"
-                                        Cursor="Hand">
+                                        Cursor="Hand"
+                                        Focusable="False">
                                     <ItemsControl ItemsSource="{Binding Cells}">
                                         <ItemsControl.ItemsPanel>
                                             <ItemsPanelTemplate>
