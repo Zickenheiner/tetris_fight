@@ -81,12 +81,16 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel, IDi
         private set { _linesCleared = value; OnPropertyChanged(); }
     }
 
+    private const double GaugeMaxPixelHeight = 520.0;
+
     private double _sabotageGaugePercent;
     public double SabotageGaugePercent
     {
         get => _sabotageGaugePercent;
-        private set { _sabotageGaugePercent = value; OnPropertyChanged(); }
+        private set { _sabotageGaugePercent = value; OnPropertyChanged(); OnPropertyChanged(nameof(SabotageBarHeight)); }
     }
+
+    public double SabotageBarHeight => _sabotageGaugePercent * GaugeMaxPixelHeight;
 
     private bool _isGaugeFull;
     public bool IsGaugeFull
