@@ -4,18 +4,32 @@ using System.Runtime.InteropServices;
 
 public sealed class GameMusicService : IDisposable
 {
-    private const string MusicFile = "assets/sounds/theme.mp3";
-    private const float BaseRate = 1.0f;
-    private const float RateStep = 0.005f;
-    private const float MaxRate = 1.40f;
+    private const string DefaultMusicFile = "assets/sounds/theme.mp3";
+    private const float DefaultBaseRate = 1.0f;
+    private const float DefaultRateStep = 0.005f;
+    private const float DefaultMaxRate = 1.40f;
+    private const float DefaultVolume = 0.45f;
 
     private readonly IAudioPlayer _player;
+    private readonly string _musicFile;
+    private readonly float _baseRate;
+    private readonly float _rateStep;
+    private readonly float _maxRate;
     private bool _started;
     private bool _disposed;
 
-    public GameMusicService()
+    public GameMusicService(
+        string musicFile = DefaultMusicFile,
+        float baseRate = DefaultBaseRate,
+        float rateStep = DefaultRateStep,
+        float maxRate = DefaultMaxRate,
+        float volume = DefaultVolume)
     {
-        _player = CreatePlayer();
+        _musicFile = musicFile;
+        _baseRate = baseRate;
+        _rateStep = rateStep;
+        _maxRate = maxRate;
+        _player = CreatePlayer(_musicFile, baseRate, volume);
     }
 
     public void Start()
@@ -58,7 +72,7 @@ public sealed class GameMusicService : IDisposable
         if (_disposed)
             return;
 
-        float rate = Math.Min(MaxRate, BaseRate + Math.Max(0, speedLevel) * RateStep);
+        float rate = Math.Min(_maxRate, _baseRate + Math.Max(0, speedLevel) * _rateStep);
         _player.SetRate(rate);
     }
 
@@ -71,25 +85,25 @@ public sealed class GameMusicService : IDisposable
         _player.Dispose();
     }
 
-    private static IAudioPlayer CreatePlayer()
+    private static IAudioPlayer CreatePlayer(string musicFile, float baseRate, float volume)
     {
-        string path = ResolveMusicPath();
+        string path = ResolveMusicPath(musicFile);
         if (!File.Exists(path))
             return NoOpAudioPlayer.Instance;
 
         if (OperatingSystem.IsMacOS())
-            return MacOsAudioPlayer.TryCreate(path) is { } player ? player : NoOpAudioPlayer.Instance;
+            return MacOsAudioPlayer.TryCreate(path, baseRate, volume) is { } player ? player : NoOpAudioPlayer.Instance;
 
         return NoOpAudioPlayer.Instance;
     }
 
-    private static string ResolveMusicPath()
+    private static string ResolveMusicPath(string musicFile)
     {
-        string outputPath = Path.Combine(AppContext.BaseDirectory, MusicFile);
+        string outputPath = Path.Combine(AppContext.BaseDirectory, musicFile);
         if (File.Exists(outputPath))
             return outputPath;
 
-        return Path.Combine(Environment.CurrentDirectory, MusicFile);
+        return Path.Combine(Environment.CurrentDirectory, musicFile);
     }
 
     private interface IAudioPlayer : IDisposable
@@ -127,7 +141,7 @@ public sealed class GameMusicService : IDisposable
             _player = player;
         }
 
-        public static MacOsAudioPlayer? TryCreate(string path)
+        public static MacOsAudioPlayer? TryCreate(string path, float baseRate, float volume)
         {
             try
             {
@@ -162,8 +176,8 @@ public sealed class GameMusicService : IDisposable
 
                 Void_objc_msgSend_NInt(player, sel_registerName("setNumberOfLoops:"), -1);
                 Void_objc_msgSend_Byte(player, sel_registerName("setEnableRate:"), 1);
-                Void_objc_msgSend_Float(player, sel_registerName("setVolume:"), 0.45f);
-                Void_objc_msgSend_Float(player, sel_registerName("setRate:"), BaseRate);
+                Void_objc_msgSend_Float(player, sel_registerName("setVolume:"), volume);
+                Void_objc_msgSend_Float(player, sel_registerName("setRate:"), baseRate);
                 Bool_objc_msgSend(player, sel_registerName("prepareToPlay"));
 
                 return new MacOsAudioPlayer(player);
