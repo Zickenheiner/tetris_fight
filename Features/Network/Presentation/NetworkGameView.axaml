@@ -76,7 +76,8 @@
                                             Background="Transparent"
                                             BorderBrush="#5EDBE8" BorderThickness="1"
                                             CornerRadius="2"
-                                            Cursor="Hand">
+                                            Cursor="Hand"
+                                            Focusable="False">
                                         <Button.Styles>
                                             <Style Selector="Button">
                                                 <Style.Animations>
