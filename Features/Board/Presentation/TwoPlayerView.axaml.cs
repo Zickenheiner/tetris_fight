@@ -31,9 +31,11 @@ public partial class TwoPlayerView : UserControl
 
         if (e.Key == Key.Escape)
         {
-            if (vm.IsPaused) vm.Resume(); else vm.Pause();
+            if (vm.IsMatchOver) ReturnToMenuRequested?.Invoke();
+            else if (vm.IsPaused) vm.Resume();
+            else vm.Pause();
         }
-        else if (!vm.IsPaused)
+        else if (!vm.IsPaused && !vm.IsMatchOver)
         {
             vm.PlayerBoard.HandleKey(e.Key);
         }

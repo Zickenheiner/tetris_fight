@@ -20,6 +20,12 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
 
     private int _opponentPreviousLines;
 
+    private bool _localDead;
+    private bool _opponentDead;
+    private bool _matchEnded;
+    private int _localDeathScore;
+    private int _opponentDeathScore;
+
     private int _ping = -1;
     public int Ping { get => _ping; private set { _ping = value; OnPropertyChanged(); OnPropertyChanged(nameof(PingText)); } }
     public string PingText => _ping < 0 ? "— ms" : $"{_ping} ms";
@@ -33,6 +39,29 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
     private bool _isMenuOpen;
     public bool IsMenuOpen { get => _isMenuOpen; private set { _isMenuOpen = value; OnPropertyChanged(); } }
 
+    private bool _isMatchOver;
+    public bool IsMatchOver
+    {
+        get => _isMatchOver;
+        private set { _isMatchOver = value; OnPropertyChanged(); }
+    }
+
+    private bool _isLocalPlayerWinner;
+    public bool IsLocalPlayerWinner
+    {
+        get => _isLocalPlayerWinner;
+        private set { _isLocalPlayerWinner = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsLocalPlayerLoser)); }
+    }
+
+    private bool _isMatchDraw;
+    public bool IsMatchDraw
+    {
+        get => _isMatchDraw;
+        private set { _isMatchDraw = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsLocalPlayerLoser)); }
+    }
+
+    public bool IsLocalPlayerLoser => !_isLocalPlayerWinner && !_isMatchDraw;
+
     public void OpenMenu() => IsMenuOpen = true;
     public void CloseMenu() => IsMenuOpen = false;
 
@@ -43,6 +72,7 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
         _network = network;
         _localService = new BoardService();
         _localService.StateChanged += OnLocalStateChanged;
+        _localService.GameOver += HandleLocalDied;
 
         _network.OpponentBoardReceived += OnOpponentBoardReceived;
         _network.PingUpdated += ms => Ping = ms;
@@ -52,7 +82,6 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
 
         if (isHost)
         {
-            // Seed appliquée avant le premier SpawnPiece
             int seed = Random.Shared.Next();
             _localService.SetSeed(seed);
             _network.SendSeed(seed);
@@ -60,7 +89,6 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
         }
         else
         {
-            // Démarrage différé : on attend la seed avant de spawner la première pièce
             LocalBoard = new BoardViewModel(_localService, autoStart: false);
         }
 
@@ -73,6 +101,13 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
         int delta = snap.LinesCleared - _opponentPreviousLines;
         _opponentPreviousLines = snap.LinesCleared;
         if (delta > 0) _localService.AddSabotageCharge(delta);
+
+        if (snap.IsGameOver && !_opponentDead)
+            HandleOpponentDied(snap.Score);
+
+        if (_localDead && !_matchEnded && snap.Score > _localDeathScore)
+            EndMatch(-1);
+
         OpponentBoard.UpdateFromSnapshot(snap);
     }
 
@@ -81,6 +116,65 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
         var state = _localService.State;
         var snapshot = BuildSnapshot(state);
         _network.SendBoard(snapshot);
+
+        if (_opponentDead && !_matchEnded && state.Score > _opponentDeathScore)
+            EndMatch(1);
+    }
+
+    private void HandleLocalDied()
+    {
+        _localDead = true;
+        _localDeathScore = _localService.State.Score;
+
+        if (_opponentDead)
+        {
+            EndMatch(_localDeathScore.CompareTo(_opponentDeathScore));
+            return;
+        }
+
+        if (_localDeathScore > OpponentBoard.Score)
+        {
+            // L'adversaire doit dépasser le score local — suivi dans OnOpponentBoardReceived
+        }
+        else
+        {
+            EndMatch(-1);
+        }
+    }
+
+    private void HandleOpponentDied(int opponentScore)
+    {
+        _opponentDead = true;
+        _opponentDeathScore = opponentScore;
+
+        if (_localDead)
+        {
+            EndMatch(_localDeathScore.CompareTo(_opponentDeathScore));
+            return;
+        }
+
+        if (_opponentDeathScore > _localService.State.Score)
+        {
+            // Le joueur local doit dépasser le score adversaire — suivi dans OnLocalStateChanged
+        }
+        else
+        {
+            EndMatch(1);
+        }
+    }
+
+    // sign > 0 : local gagne, sign < 0 : local perd, sign == 0 : égalité
+    private void EndMatch(int sign)
+    {
+        if (_matchEnded) return;
+        _matchEnded = true;
+
+        if (!LocalBoard.IsGameOver) LocalBoard.Pause();
+        LocalBoard.StopMusic();
+
+        if (sign == 0) IsMatchDraw = true;
+        else IsLocalPlayerWinner = sign > 0;
+        IsMatchOver = true;
     }
 
     private void OnSeedReceived(int seed)
@@ -142,18 +236,19 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
     {
         if (key == Key.Escape)
         {
-            if (IsDisconnected) ReturnToMenuRequested?.Invoke();
+            if (IsMatchOver || IsDisconnected) ReturnToMenuRequested?.Invoke();
             else if (IsMenuOpen) CloseMenu();
             else OpenMenu();
             return;
         }
-        if (!IsMenuOpen)
+        if (!IsMenuOpen && !IsMatchOver)
             LocalBoard.HandleKey(key);
     }
 
     public void Dispose()
     {
         _localService.StateChanged -= OnLocalStateChanged;
+        _localService.GameOver -= HandleLocalDied;
         _network.OpponentBoardReceived -= OnOpponentBoardReceived;
         _network.SeedReceived -= OnSeedReceived;
         LocalBoard.Dispose();

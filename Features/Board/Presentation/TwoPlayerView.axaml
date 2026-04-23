@@ -258,6 +258,43 @@
                 </Button>
             </StackPanel>
         </Border>
+
+        <!-- Overlay résultat de la partie -->
+        <Border IsVisible="{Binding IsMatchOver}" Background="#EE000011"
+                HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="18">
+                <TextBlock IsVisible="{Binding IsLocalPlayerWinner}"
+                           Text="VICTOIRE"
+                           Foreground="#FFD700" FontFamily="Courier New"
+                           FontSize="52" FontWeight="Black" LetterSpacing="8"
+                           HorizontalAlignment="Center">
+                    <TextBlock.Styles>
+                        <Style Selector="TextBlock">
+                            <Style.Animations>
+                                <Animation Duration="0:0:1.2" IterationCount="Infinite" PlaybackDirection="Alternate">
+                                    <KeyFrame Cue="0%"><Setter Property="Opacity" Value="0.8"/></KeyFrame>
+                                    <KeyFrame Cue="100%"><Setter Property="Opacity" Value="1"/></KeyFrame>
+                                </Animation>
+                            </Style.Animations>
+                        </Style>
+                    </TextBlock.Styles>
+                </TextBlock>
+                <TextBlock IsVisible="{Binding IsLocalPlayerLoser}"
+                           Text="DÉFAITE"
+                           Foreground="#FF4444" FontFamily="Courier New"
+                           FontSize="52" FontWeight="Black" LetterSpacing="8"
+                           HorizontalAlignment="Center"/>
+                <TextBlock IsVisible="{Binding IsMatchDraw}"
+                           Text="ÉGALITÉ"
+                           Foreground="#AAAAFF" FontFamily="Courier New"
+                           FontSize="52" FontWeight="Black" LetterSpacing="8"
+                           HorizontalAlignment="Center"/>
+                <TextBlock Text="[Échap] pour revenir au menu"
+                           Foreground="#666688" FontFamily="Courier New"
+                           FontSize="11" LetterSpacing="1"
+                           HorizontalAlignment="Center" Margin="0,12,0,0"/>
+            </StackPanel>
+        </Border>
     </Grid>
 
 </UserControl>
