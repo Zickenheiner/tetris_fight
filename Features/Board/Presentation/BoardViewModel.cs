@@ -31,7 +31,7 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel, IDi
 
     public CellViewModel[] Cells { get; }
     public CellViewModel[] NextPieceCells { get; }
-    public bool ShowGhost { get; private set; } = true;
+    public bool ShowGhost { get; private set; }
 
     private bool _isGameOver;
     public bool IsGameOver
@@ -125,12 +125,14 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel, IDi
         IBoardService boardService,
         bool autoStart = true,
         bool enableMusic = true,
-        bool stopMusicOnGameOver = true)
+        bool stopMusicOnGameOver = true,
+        bool showGhost = true)
     {
         _boardService = boardService;
         _gameLoop = new GameLoopService(_boardService);
         _music = enableMusic ? new GameMusicService() : null;
         _stopMusicOnGameOver = stopMusicOnGameOver;
+        ShowGhost = showGhost;
 
         Cells = Enumerable.Range(0, BoardState.Rows * BoardState.Cols)
                           .Select(_ => new CellViewModel())
