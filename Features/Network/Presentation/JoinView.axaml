@@ -2,7 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:tetris_fight.Features.Network.Presentation"
              x:Class="tetris_fight.Features.Network.Presentation.JoinView"
-             x:DataType="vm:JoinViewModel">
+             x:DataType="vm:JoinViewModel"
+             Width="460" Height="660">
 
     <UserControl.Background>
         <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">

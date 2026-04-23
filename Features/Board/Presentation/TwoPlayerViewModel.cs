@@ -11,6 +11,7 @@ public sealed class TwoPlayerViewModel : INotifyPropertyChanged, IDisposable
     public BoardViewModel AiBoard { get; }
 
     private readonly AiPlayerService _ai;
+    private readonly IBoardService _aiService;
 
     private bool _isPaused;
     public bool IsPaused
@@ -23,12 +24,13 @@ public sealed class TwoPlayerViewModel : INotifyPropertyChanged, IDisposable
 
     public TwoPlayerViewModel()
     {
+        _aiService = new BoardService();
+        AiBoard = new BoardViewModel(_aiService);
+        _ai = new AiPlayerService(_aiService);
+
         PlayerBoard = new BoardViewModel();
         PlayerBoard.ReturnToMenuRequested += () => ReturnToMenuRequested?.Invoke();
-
-        var aiService = new BoardService();
-        AiBoard = new BoardViewModel(aiService);
-        _ai = new AiPlayerService(aiService);
+        PlayerBoard.SabotageActivated += type => _aiService.ForcePiece(type);
     }
 
     public void Pause()

@@ -22,11 +22,19 @@ public class OpponentBoardViewModel : INotifyPropertyChanged, IBoardRenderViewMo
     private bool _isGameOver;
     public bool IsGameOver { get => _isGameOver; private set { _isGameOver = value; OnPropertyChanged(); } }
 
+    private double _sabotageGaugePercent;
+    public double SabotageGaugePercent { get => _sabotageGaugePercent; private set { _sabotageGaugePercent = value; OnPropertyChanged(); } }
+
+    private bool _isGaugeFull;
+    public bool IsGaugeFull { get => _isGaugeFull; private set { _isGaugeFull = value; OnPropertyChanged(); } }
+
     public void UpdateFromSnapshot(BoardSnapshot snapshot)
     {
         Score = snapshot.Score;
         LinesCleared = snapshot.LinesCleared;
         IsGameOver = snapshot.IsGameOver;
+        SabotageGaugePercent = snapshot.SabotageCharge / (double)BoardState.SabotageGaugeMax;
+        IsGaugeFull = snapshot.SabotageCharge >= BoardState.SabotageGaugeMax;
 
         for (int i = 0; i < Math.Min(snapshot.Grid.Length, Cells.Length); i++)
         {

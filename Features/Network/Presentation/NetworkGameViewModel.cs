@@ -46,6 +46,7 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
         _network.PingUpdated += ms => Ping = ms;
         _network.Disconnected += OnDisconnected;
         _network.SeedReceived += OnSeedReceived;
+        _network.SabotageReceived += type => _localService.ForcePiece(type);
 
         if (isHost)
         {
@@ -62,6 +63,7 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
         }
 
         LocalBoard.ReturnToMenuRequested += () => ReturnToMenuRequested?.Invoke();
+        LocalBoard.SabotageActivated += type => _network.SendSabotage(type);
     }
 
     private void OnLocalStateChanged()
@@ -112,7 +114,8 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
             NextPiece = next,
             Score = state.Score,
             LinesCleared = state.LinesCleared,
-            IsGameOver = state.IsGameOver
+            IsGameOver = state.IsGameOver,
+            SabotageCharge = state.SabotageCharge
         };
     }
 

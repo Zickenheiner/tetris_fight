@@ -4,8 +4,8 @@
              x:Class="tetris_fight.Features.Board.Presentation.BoardView"
              x:DataType="vm:BoardViewModel">
 
-    <Grid Background="#0d0d1a" HorizontalAlignment="Center" VerticalAlignment="Center">
-    <Grid ColumnDefinitions="Auto,Auto">
+    <Grid Background="#0d0d1a">
+    <Grid ColumnDefinitions="Auto,Auto" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="50">
 
         <!-- Plateau de jeu 10×20 avec overlay game over -->
         <Grid Grid.Column="0">

@@ -9,4 +9,6 @@ public interface IBoardRenderViewModel : INotifyPropertyChanged
     int Score { get; }
     int LinesCleared { get; }
     bool IsGameOver { get; }
+    double SabotageGaugePercent { get; }
+    bool IsGaugeFull { get; }
 }

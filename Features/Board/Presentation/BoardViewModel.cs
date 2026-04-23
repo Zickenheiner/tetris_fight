@@ -8,6 +8,7 @@ using Avalonia.Threading;
 using tetris_fight.Features.Board.Application;
 using tetris_fight.Features.Board.Domain;
 using tetris_fight.Features.Board.Infrastructure;
+using tetris_fight.Features.Shared;
 
 public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
 {
@@ -64,6 +65,35 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
         private set { _linesCleared = value; OnPropertyChanged(); }
     }
 
+    private double _sabotageGaugePercent;
+    public double SabotageGaugePercent
+    {
+        get => _sabotageGaugePercent;
+        private set { _sabotageGaugePercent = value; OnPropertyChanged(); }
+    }
+
+    private bool _isGaugeFull;
+    public bool IsGaugeFull
+    {
+        get => _isGaugeFull;
+        private set { _isGaugeFull = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsGaugeVisible)); }
+    }
+
+    public bool IsGaugeVisible => !IsGaugeFull;
+
+    public SabotagePieceItemViewModel[] SabotageSelectorItems { get; }
+
+    public event Action<TetrominoType>? SabotageActivated;
+
+    public void ActivateSabotage(TetrominoType type)
+    {
+        if (!IsGaugeFull) return;
+        SabotageActivated?.Invoke(type);
+        _boardService.ConsumeSabotageCharge();
+    }
+
+    public void ConsumeSabotageCharge() => _boardService.ConsumeSabotageCharge();
+
     public event Action? ReturnToMenuRequested;
     public event PropertyChangedEventHandler? PropertyChanged;
     private void OnPropertyChanged([CallerMemberName] string? name = null)
@@ -83,6 +113,10 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
         NextPieceCells = Enumerable.Range(0, 4 * 4)
                                    .Select(_ => new CellViewModel())
                                    .ToArray();
+
+        SabotageSelectorItems = Enum.GetValues<TetrominoType>()
+                                    .Select(t => new SabotagePieceItemViewModel(t, ActivateSabotage))
+                                    .ToArray();
 
         _boardService.StateChanged += RefreshGrid;
         _boardService.GameOver += StartGameOverAnimation;
@@ -179,8 +213,11 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
         state.NextPiece = null;
         state.Score = 0;
         state.LinesCleared = 0;
+        state.SabotageCharge = 0;
         Score = 0;
         LinesCleared = 0;
+        SabotageGaugePercent = 0;
+        IsGaugeFull = false;
         for (int r = 0; r < BoardState.Rows; r++)
             for (int c = 0; c < BoardState.Cols; c++)
                 state.Grid[r, c] = null;
@@ -193,6 +230,8 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
         var state = _boardService.State;
         Score = state.Score;
         LinesCleared = state.LinesCleared;
+        SabotageGaugePercent = state.SabotageCharge / (double)BoardState.SabotageGaugeMax;
+        IsGaugeFull = state.SabotageCharge >= BoardState.SabotageGaugeMax;
 
         for (int r = 0; r < BoardState.Rows; r++)
             for (int c = 0; c < BoardState.Cols; c++)

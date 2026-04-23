@@ -3,7 +3,8 @@
              xmlns:vm="using:tetris_fight.Features.Menu.Presentation"
              x:Class="tetris_fight.Features.Menu.Presentation.MainMenuView"
              x:DataType="vm:MainMenuViewModel"
-             Focusable="True">
+             Focusable="True"
+             Width="460" Height="660">
 
     <UserControl.Background>
         <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
