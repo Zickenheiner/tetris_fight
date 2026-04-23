@@ -15,4 +15,7 @@ public class BoardState
 
     public int Score { get; set; }
     public int LinesCleared { get; set; }
+
+    public const int SabotageGaugeMax = 4;
+    public int SabotageCharge { get; set; }
 }

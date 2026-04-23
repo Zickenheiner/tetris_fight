@@ -15,6 +15,8 @@ public interface IBoardService
     void LockPiece();
     int GetGhostRow();
     void SetSeed(int seed);
+    void ConsumeSabotageCharge();
+    void ForcePiece(TetrominoType type);
     event Action? StateChanged;
     event Action? GameOver;
 }

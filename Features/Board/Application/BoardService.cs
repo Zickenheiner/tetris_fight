@@ -155,6 +155,7 @@ public class BoardService : IBoardService
         int cleared = rowsToClear.Length;
         State.LinesCleared += cleared;
         State.Score += LineScores[Math.Min(cleared, 4)];
+        State.SabotageCharge = Math.Min(State.SabotageCharge + cleared, BoardState.SabotageGaugeMax);
     }
 
     private int[] FindFullRows()
@@ -167,6 +168,24 @@ public class BoardService : IBoardService
         }
 
         return rows.ToArray();
+    }
+
+    public void ConsumeSabotageCharge()
+    {
+        State.SabotageCharge = 0;
+        StateChanged?.Invoke();
+    }
+
+    public void ForcePiece(TetrominoType type)
+    {
+        if (State.IsGameOver) return;
+        var piece = new Tetromino(type);
+        var pos = State.CurrentPiece is not null && IsValid(piece, State.CurrentPosition)
+            ? State.CurrentPosition
+            : new Point(0, (BoardState.Cols - piece.BoundingBoxSize) / 2);
+        State.CurrentPiece = piece;
+        State.CurrentPosition = pos;
+        StateChanged?.Invoke();
     }
 
     public void SetSeed(int seed)
