@@ -11,7 +11,11 @@ public sealed class TwoPlayerViewModel : INotifyPropertyChanged, IDisposable
     public BoardViewModel AiBoard { get; }
 
     private readonly AiPlayerService _ai;
+    private readonly IBoardService _playerService;
     private readonly IBoardService _aiService;
+
+    private int _playerPreviousLines;
+    private int _aiPreviousLines;
 
     private bool _isPaused;
     public bool IsPaused
@@ -24,9 +28,10 @@ public sealed class TwoPlayerViewModel : INotifyPropertyChanged, IDisposable
 
     public TwoPlayerViewModel()
     {
+        _playerService = new BoardService();
         _aiService = new BoardService();
 
-        PlayerBoard = new BoardViewModel(new BoardService(), stopMusicOnGameOver: false);
+        PlayerBoard = new BoardViewModel(_playerService, stopMusicOnGameOver: false);
         PlayerBoard.ReturnToMenuRequested += () => ReturnToMenuRequested?.Invoke();
         PlayerBoard.SabotageActivated += type => _aiService.ForcePiece(type);
         PlayerBoard.PropertyChanged += OnBoardPropertyChanged;
@@ -34,6 +39,26 @@ public sealed class TwoPlayerViewModel : INotifyPropertyChanged, IDisposable
         AiBoard = new BoardViewModel(_aiService, enableMusic: false);
         AiBoard.PropertyChanged += OnBoardPropertyChanged;
         _ai = new AiPlayerService(_aiService);
+
+        // Les lignes cassées par l'adversaire rechargent ta jauge
+        _playerService.StateChanged += OnPlayerStateChanged;
+        _aiService.StateChanged += OnAiStateChanged;
+    }
+
+    private void OnPlayerStateChanged()
+    {
+        int current = _playerService.State.LinesCleared;
+        int delta = current - _playerPreviousLines;
+        _playerPreviousLines = current;
+        if (delta > 0) _aiService.AddSabotageCharge(delta);
+    }
+
+    private void OnAiStateChanged()
+    {
+        int current = _aiService.State.LinesCleared;
+        int delta = current - _aiPreviousLines;
+        _aiPreviousLines = current;
+        if (delta > 0) _playerService.AddSabotageCharge(delta);
     }
 
     private void OnBoardPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -70,6 +95,8 @@ public sealed class TwoPlayerViewModel : INotifyPropertyChanged, IDisposable
 
     public void Dispose()
     {
+        _playerService.StateChanged -= OnPlayerStateChanged;
+        _aiService.StateChanged -= OnAiStateChanged;
         PlayerBoard.PropertyChanged -= OnBoardPropertyChanged;
         AiBoard.PropertyChanged -= OnBoardPropertyChanged;
         _ai.Dispose();
