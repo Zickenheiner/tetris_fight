@@ -92,14 +92,18 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel, IDi
 
     public double SabotageBarHeight => _sabotageGaugePercent * GaugeMaxPixelHeight;
 
+    private bool _canSabotage = true;
+
     private bool _isGaugeFull;
     public bool IsGaugeFull
     {
         get => _isGaugeFull;
-        private set { _isGaugeFull = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsGaugeVisible)); }
+        private set { _isGaugeFull = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsGaugeVisible)); OnPropertyChanged(nameof(IsSabotageSelectorVisible)); OnPropertyChanged(nameof(IsGaugeFullIndicatorVisible)); }
     }
 
     public bool IsGaugeVisible => !IsGaugeFull;
+    public bool IsSabotageSelectorVisible => _isGaugeFull && _canSabotage;
+    public bool IsGaugeFullIndicatorVisible => _isGaugeFull && !_canSabotage;
 
     public SabotagePieceItemViewModel[] SabotageSelectorItems { get; }
 
@@ -126,13 +130,15 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel, IDi
         bool autoStart = true,
         bool enableMusic = true,
         bool stopMusicOnGameOver = true,
-        bool showGhost = true)
+        bool showGhost = true,
+        bool canSabotage = true)
     {
         _boardService = boardService;
         _gameLoop = new GameLoopService(_boardService);
         _music = enableMusic ? new GameMusicService() : null;
         _stopMusicOnGameOver = stopMusicOnGameOver;
         ShowGhost = showGhost;
+        _canSabotage = canSabotage;
 
         Cells = Enumerable.Range(0, BoardState.Rows * BoardState.Cols)
                           .Select(_ => new CellViewModel())
