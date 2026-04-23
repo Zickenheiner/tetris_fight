@@ -156,6 +156,18 @@ public class BoardService : IBoardService
         StateChanged?.Invoke();
     }
 
+    public void ForcePiece(TetrominoType type)
+    {
+        if (State.IsGameOver) return;
+        var piece = new Tetromino(type);
+        var pos = State.CurrentPiece is not null && IsValid(piece, State.CurrentPosition)
+            ? State.CurrentPosition
+            : new Point(0, (BoardState.Cols - piece.BoundingBoxSize) / 2);
+        State.CurrentPiece = piece;
+        State.CurrentPosition = pos;
+        StateChanged?.Invoke();
+    }
+
     public void SetSeed(int seed)
     {
         _random = new Random(seed);

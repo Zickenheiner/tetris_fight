@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:tetris_fight.Features.Board.Presentation"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              x:Class="tetris_fight.Features.Board.Presentation.TwoPlayerView"
              x:DataType="vm:TwoPlayerViewModel"
              Focusable="True">
@@ -10,31 +11,51 @@
             <Grid ColumnDefinitions="Auto,Auto,Auto" Background="#0d0d1a"
                   HorizontalAlignment="Center" VerticalAlignment="Center">
 
-                <!-- Jauge verticale de sabotage (gauche) -->
-                <Grid Grid.Column="0" Width="22" Margin="0,0,6,0">
-                    <Border Background="#111130" CornerRadius="3" Width="14" HorizontalAlignment="Center"/>
-                    <Border Background="#FF6600" CornerRadius="3" Width="14" HorizontalAlignment="Center"
+                <!-- Jauge / Sélecteur de sabotage (gauche) -->
+                <Grid Grid.Column="0" Width="50" Margin="0,0,6,0">
+
+                    <!-- Jauge normale (masquée quand pleine) -->
+                    <Border IsVisible="{Binding IsGaugeVisible}"
+                            Background="#111130" CornerRadius="3" Width="14" HorizontalAlignment="Center"/>
+                    <Border IsVisible="{Binding IsGaugeVisible}"
+                            Background="#FF6600" CornerRadius="3" Width="14" HorizontalAlignment="Center"
                             RenderTransformOrigin="0.5,1">
                         <Border.RenderTransform>
                             <ScaleTransform ScaleY="{Binding SabotageGaugePercent}"/>
                         </Border.RenderTransform>
                     </Border>
-                    <Border Name="GaugePulse"
-                            IsVisible="{Binding IsGaugeFull}"
-                            BorderBrush="#FF9900" BorderThickness="1.5"
-                            CornerRadius="3" Width="14" HorizontalAlignment="Center"
-                            Background="Transparent">
-                        <Border.Styles>
-                            <Style Selector="Border#GaugePulse">
-                                <Style.Animations>
-                                    <Animation Duration="0:0:0.7" IterationCount="Infinite" PlaybackDirection="Alternate">
-                                        <KeyFrame Cue="0%"><Setter Property="Opacity" Value="0.15"/></KeyFrame>
-                                        <KeyFrame Cue="100%"><Setter Property="Opacity" Value="1.0"/></KeyFrame>
-                                    </Animation>
-                                </Style.Animations>
-                            </Style>
-                        </Border.Styles>
-                    </Border>
+
+                    <!-- Sélecteur de pièces (visible quand jauge pleine) -->
+                    <ItemsControl IsVisible="{Binding IsGaugeFull}"
+                                  ItemsSource="{Binding SabotageSelectorItems}"
+                                  VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SabotagePieceItemViewModel">
+                                <Button Command="{Binding SelectCommand}"
+                                        Margin="0,2" Padding="2"
+                                        Background="Transparent"
+                                        BorderBrush="#2a2a5a" BorderThickness="1"
+                                        CornerRadius="2"
+                                        Cursor="Hand">
+                                    <ItemsControl ItemsSource="{Binding Cells}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <UniformGrid Rows="4" Columns="4"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="vm:CellViewModel">
+                                                <Border Background="{Binding Background}"
+                                                        Width="10" Height="10"
+                                                        BorderBrush="#1a1a3a"
+                                                        BorderThickness="{Binding CellBorderThickness}"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </Grid>
 
                 <!-- Plateau 10×20 -->

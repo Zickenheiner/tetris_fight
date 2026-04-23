@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using Avalonia.Threading;
+using tetris_fight.Features.Board.Domain;
 using tetris_fight.Features.Network.Application;
 using tetris_fight.Features.Network.Domain;
 
@@ -31,6 +32,7 @@ public sealed class TcpNetworkService : INetworkService
     public event Action<BoardSnapshot>? OpponentBoardReceived;
     public event Action<int>? PingUpdated;
     public event Action<int>? SeedReceived;
+    public event Action<TetrominoType>? SabotageReceived;
 
     public async Task StartHostAsync(CancellationToken ct = default)
     {
@@ -66,6 +68,11 @@ public sealed class TcpNetworkService : INetworkService
     public void SendSeed(int seed)
     {
         SendMessage(new NetworkMessage { Type = NetworkMessageType.Seed, Payload = seed.ToString() });
+    }
+
+    public void SendSabotage(TetrominoType type)
+    {
+        SendMessage(new NetworkMessage { Type = NetworkMessageType.Sabotage, Payload = ((int)type).ToString() });
     }
 
     private void SetupStreams()
@@ -134,6 +141,11 @@ public sealed class TcpNetworkService : INetworkService
             case NetworkMessageType.Seed when msg.Payload is not null:
                 if (int.TryParse(msg.Payload, out int seed))
                     Dispatcher.UIThread.Post(() => SeedReceived?.Invoke(seed));
+                break;
+
+            case NetworkMessageType.Sabotage when msg.Payload is not null:
+                if (int.TryParse(msg.Payload, out int typeId) && Enum.IsDefined(typeof(TetrominoType), typeId))
+                    Dispatcher.UIThread.Post(() => SabotageReceived?.Invoke((TetrominoType)typeId));
                 break;
         }
     }

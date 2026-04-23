@@ -8,6 +8,7 @@ using Avalonia.Threading;
 using tetris_fight.Features.Board.Application;
 using tetris_fight.Features.Board.Domain;
 using tetris_fight.Features.Board.Infrastructure;
+using tetris_fight.Features.Shared;
 
 public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
 {
@@ -75,7 +76,20 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
     public bool IsGaugeFull
     {
         get => _isGaugeFull;
-        private set { _isGaugeFull = value; OnPropertyChanged(); }
+        private set { _isGaugeFull = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsGaugeVisible)); }
+    }
+
+    public bool IsGaugeVisible => !IsGaugeFull;
+
+    public SabotagePieceItemViewModel[] SabotageSelectorItems { get; }
+
+    public event Action<TetrominoType>? SabotageActivated;
+
+    public void ActivateSabotage(TetrominoType type)
+    {
+        if (!IsGaugeFull) return;
+        SabotageActivated?.Invoke(type);
+        _boardService.ConsumeSabotageCharge();
     }
 
     public void ConsumeSabotageCharge() => _boardService.ConsumeSabotageCharge();
@@ -99,6 +113,10 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
         NextPieceCells = Enumerable.Range(0, 4 * 4)
                                    .Select(_ => new CellViewModel())
                                    .ToArray();
+
+        SabotageSelectorItems = Enum.GetValues<TetrominoType>()
+                                    .Select(t => new SabotagePieceItemViewModel(t, ActivateSabotage))
+                                    .ToArray();
 
         _boardService.StateChanged += RefreshGrid;
         _boardService.GameOver += StartGameOverAnimation;
