@@ -116,9 +116,9 @@ public sealed class TwoPlayerViewModel : INotifyPropertyChanged, IDisposable
             return;
         }
 
-        if (_playerDeathScore > AiBoard.Score)
+        if (_playerDeathScore >= AiBoard.Score)
         {
-            // L'IA doit dépasser le score du joueur — suivi dans OnAiStateChanged
+            // L'IA doit strictement dépasser le score du joueur — suivi dans OnAiStateChanged
         }
         else
         {
@@ -137,9 +137,9 @@ public sealed class TwoPlayerViewModel : INotifyPropertyChanged, IDisposable
             return;
         }
 
-        if (_aiDeathScore > PlayerBoard.Score)
+        if (_aiDeathScore >= PlayerBoard.Score)
         {
-            // Le joueur doit dépasser le score de l'IA — suivi dans OnPlayerStateChanged
+            // Le joueur doit strictement dépasser le score de l'IA — suivi dans OnPlayerStateChanged
         }
         else
         {

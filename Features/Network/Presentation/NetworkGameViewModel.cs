@@ -135,9 +135,9 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
             return;
         }
 
-        if (_localDeathScore > OpponentBoard.Score)
+        if (_localDeathScore >= OpponentBoard.Score)
         {
-            // L'adversaire doit dépasser le score local — suivi dans OnOpponentBoardReceived
+            // L'adversaire doit strictement dépasser le score local — suivi dans OnOpponentBoardReceived
         }
         else
         {
@@ -156,9 +156,9 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
             return;
         }
 
-        if (_opponentDeathScore > _localService.State.Score)
+        if (_opponentDeathScore >= _localService.State.Score)
         {
-            // Le joueur local doit dépasser le score adversaire — suivi dans OnLocalStateChanged
+            // Le joueur local doit strictement dépasser le score adversaire — suivi dans OnLocalStateChanged
         }
         else
         {
