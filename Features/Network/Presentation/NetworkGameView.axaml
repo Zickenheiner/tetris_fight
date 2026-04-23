@@ -26,16 +26,16 @@
                             <Border Background="#111130"
                                     BorderBrush="#2e3568"
                                     BorderThickness="1"
-                                    CornerRadius="4"/>
+                                    CornerRadius="8"/>
                             <Border Margin="2"
                                     Height="520"
                                     Background="#0c0f25"
-                                    CornerRadius="3"
+                                    CornerRadius="6"
                                     VerticalAlignment="Bottom"/>
                             <Border Margin="2"
                                     Height="{Binding LocalBoard.SabotageBarHeight}"
                                     VerticalAlignment="Bottom"
-                                    CornerRadius="3"
+                                    CornerRadius="6"
                                     Opacity="0.95">
                                 <Border.Background>
                                     <LinearGradientBrush StartPoint="0%,100%" EndPoint="0%,0%">
@@ -54,7 +54,7 @@
                                     Height="{Binding LocalBoard.SabotageBarHeight}"
                                     VerticalAlignment="Bottom"
                                     Background="#66E8FDFF"
-                                    CornerRadius="2"
+                                    CornerRadius="4"
                                     Opacity="0.8"
                                     IsHitTestVisible="False">
                                 <Border.Transitions>
@@ -204,16 +204,16 @@
                             <Border Background="#111130"
                                     BorderBrush="#2e3568"
                                     BorderThickness="1"
-                                    CornerRadius="4"/>
+                                    CornerRadius="8"/>
                             <Border Margin="2"
                                     Height="520"
                                     Background="#0c0f25"
-                                    CornerRadius="3"
+                                    CornerRadius="6"
                                     VerticalAlignment="Bottom"/>
                             <Border Margin="2"
                                     Height="{Binding OpponentBoard.SabotageBarHeight}"
                                     VerticalAlignment="Bottom"
-                                    CornerRadius="3"
+                                    CornerRadius="6"
                                     Opacity="0.95">
                                 <Border.Background>
                                     <LinearGradientBrush StartPoint="0%,100%" EndPoint="0%,0%">
@@ -232,7 +232,7 @@
                                     Height="{Binding OpponentBoard.SabotageBarHeight}"
                                     VerticalAlignment="Bottom"
                                     Background="#66E8FDFF"
-                                    CornerRadius="2"
+                                    CornerRadius="4"
                                     Opacity="0.8"
                                     IsHitTestVisible="False">
                                 <Border.Transitions>
@@ -244,7 +244,7 @@
                         </Grid>
                         <Border IsVisible="{Binding OpponentBoard.IsGaugeFull}"
                                 BorderBrush="#5EDBE8" BorderThickness="1.5"
-                                CornerRadius="4" Width="16" HorizontalAlignment="Center"
+                                CornerRadius="8" Width="16" HorizontalAlignment="Center"
                                 Background="Transparent">
                             <Border.Styles>
                                 <Style Selector="Border">
