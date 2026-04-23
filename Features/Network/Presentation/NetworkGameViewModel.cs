@@ -18,6 +18,8 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
     public BoardViewModel LocalBoard { get; }
     public OpponentBoardViewModel OpponentBoard { get; } = new();
 
+    private int _opponentPreviousLines;
+
     private int _ping = -1;
     public int Ping { get => _ping; private set { _ping = value; OnPropertyChanged(); OnPropertyChanged(nameof(PingText)); } }
     public string PingText => _ping < 0 ? "— ms" : $"{_ping} ms";
@@ -42,10 +44,11 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
         _localService = new BoardService();
         _localService.StateChanged += OnLocalStateChanged;
 
-        _network.OpponentBoardReceived += snap => OpponentBoard.UpdateFromSnapshot(snap);
+        _network.OpponentBoardReceived += OnOpponentBoardReceived;
         _network.PingUpdated += ms => Ping = ms;
         _network.Disconnected += OnDisconnected;
         _network.SeedReceived += OnSeedReceived;
+        _network.SabotageReceived += type => _localService.ForcePiece(type);
 
         if (isHost)
         {
@@ -62,6 +65,15 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
         }
 
         LocalBoard.ReturnToMenuRequested += () => ReturnToMenuRequested?.Invoke();
+        LocalBoard.SabotageActivated += type => _network.SendSabotage(type);
+    }
+
+    private void OnOpponentBoardReceived(BoardSnapshot snap)
+    {
+        int delta = snap.LinesCleared - _opponentPreviousLines;
+        _opponentPreviousLines = snap.LinesCleared;
+        if (delta > 0) _localService.AddSabotageCharge(delta);
+        OpponentBoard.UpdateFromSnapshot(snap);
     }
 
     private void OnLocalStateChanged()
@@ -112,7 +124,8 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
             NextPiece = next,
             Score = state.Score,
             LinesCleared = state.LinesCleared,
-            IsGameOver = state.IsGameOver
+            IsGameOver = state.IsGameOver,
+            SabotageCharge = state.SabotageCharge
         };
     }
 
@@ -141,7 +154,9 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
     public void Dispose()
     {
         _localService.StateChanged -= OnLocalStateChanged;
+        _network.OpponentBoardReceived -= OnOpponentBoardReceived;
         _network.SeedReceived -= OnSeedReceived;
+        LocalBoard.Dispose();
         _network.Dispose();
     }
 

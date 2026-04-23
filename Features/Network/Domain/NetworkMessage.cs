@@ -1,6 +1,6 @@
 namespace tetris_fight.Features.Network.Domain;
 
-public enum NetworkMessageType { Board, Ping, Pong, Seed }
+public enum NetworkMessageType { Board, Ping, Pong, Seed, Sabotage }
 
 public class NetworkMessage
 {

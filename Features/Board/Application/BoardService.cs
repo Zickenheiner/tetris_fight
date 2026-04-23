@@ -7,6 +7,7 @@ public class BoardService : IBoardService
     private Random _random = new();
 
     public BoardState State { get; } = new();
+    public IReadOnlyList<int> LastClearedRows { get; private set; } = Array.Empty<int>();
     public event Action? StateChanged;
     public event Action? GameOver;
 
@@ -125,28 +126,71 @@ public class BoardService : IBoardService
 
     private void ClearFullLines()
     {
-        int cleared = 0;
-        for (int r = BoardState.Rows - 1; r >= 0; r--)
+        var rowsToClear = FindFullRows();
+        LastClearedRows = rowsToClear;
+
+        if (rowsToClear.Length == 0)
+            return;
+
+        var clearMask = new bool[BoardState.Rows];
+        foreach (var row in rowsToClear)
+            clearMask[row] = true;
+
+        int writeRow = BoardState.Rows - 1;
+        for (int readRow = BoardState.Rows - 1; readRow >= 0; readRow--)
         {
-            if (!Enumerable.Range(0, BoardState.Cols).All(c => State.Grid[r, c] is not null))
+            if (clearMask[readRow])
                 continue;
 
-            for (int row = r; row > 0; row--)
-                for (int c = 0; c < BoardState.Cols; c++)
-                    State.Grid[row, c] = State.Grid[row - 1, c];
-
             for (int c = 0; c < BoardState.Cols; c++)
-                State.Grid[0, c] = null;
+                State.Grid[writeRow, c] = State.Grid[readRow, c];
 
-            r++;
-            cleared++;
+            writeRow--;
         }
 
-        if (cleared > 0)
+        for (int row = writeRow; row >= 0; row--)
+            for (int c = 0; c < BoardState.Cols; c++)
+                State.Grid[row, c] = null;
+
+        int cleared = rowsToClear.Length;
+        State.LinesCleared += cleared;
+        State.Score += LineScores[Math.Min(cleared, 4)];
+    }
+
+    private int[] FindFullRows()
+    {
+        var rows = new List<int>();
+        for (int r = 0; r < BoardState.Rows; r++)
         {
-            State.LinesCleared += cleared;
-            State.Score += LineScores[Math.Min(cleared, 4)];
+            if (Enumerable.Range(0, BoardState.Cols).All(c => State.Grid[r, c] is not null))
+                rows.Add(r);
         }
+
+        return rows.ToArray();
+    }
+
+    public void ConsumeSabotageCharge()
+    {
+        State.SabotageCharge = 0;
+        StateChanged?.Invoke();
+    }
+
+    public void AddSabotageCharge(int amount)
+    {
+        State.SabotageCharge = Math.Min(State.SabotageCharge + amount, BoardState.SabotageGaugeMax);
+        StateChanged?.Invoke();
+    }
+
+    public void ForcePiece(TetrominoType type)
+    {
+        if (State.IsGameOver) return;
+        var piece = new Tetromino(type);
+        var pos = State.CurrentPiece is not null && IsValid(piece, State.CurrentPosition)
+            ? State.CurrentPosition
+            : new Point(0, (BoardState.Cols - piece.BoundingBoxSize) / 2);
+        State.CurrentPiece = piece;
+        State.CurrentPosition = pos;
+        HardDrop();
     }
 
     public void SetSeed(int seed)

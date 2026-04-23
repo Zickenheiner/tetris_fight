@@ -16,4 +16,5 @@ public class BoardSnapshot
     public int Score { get; set; }
     public int LinesCleared { get; set; }
     public bool IsGameOver { get; set; }
+    public int SabotageCharge { get; set; }
 }

@@ -5,20 +5,33 @@ using System.Runtime.CompilerServices;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
+using tetris_fight.Features.Audio.Infrastructure;
 using tetris_fight.Features.Board.Application;
 using tetris_fight.Features.Board.Domain;
 using tetris_fight.Features.Board.Infrastructure;
+using tetris_fight.Features.Shared;
 
-public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
+public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel, IDisposable
 {
+    private const int LineClearFrameMs = 40;
+    private const int LineClearFrameCount = 6;
+    private static readonly int[] LineClearDissolveOrder = { 1, 7, 3, 9, 0, 5, 2, 8, 4, 6 };
+    private static readonly IBrush LineClearBrightBrush = new SolidColorBrush(Color.Parse("#F6FFB8"));
+    private static readonly IBrush LineClearDimBrush = new SolidColorBrush(Color.Parse("#56F0F0"));
+
     private readonly IBoardService _boardService;
     private readonly GameLoopService _gameLoop;
     private readonly InputQueueService _inputQueue = new();
     private readonly DispatcherTimer _inputDrainTimer;
+    private readonly GameMusicService? _music;
+    private readonly bool _stopMusicOnGameOver;
+    private bool _isLineClearAnimating;
+    private int _lineClearAnimationVersion;
+    private bool _disposed;
 
     public CellViewModel[] Cells { get; }
     public CellViewModel[] NextPieceCells { get; }
-    public bool ShowGhost { get; private set; } = true;
+    public bool ShowGhost { get; private set; }
 
     private bool _isGameOver;
     public bool IsGameOver
@@ -36,18 +49,22 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
 
     public void Pause()
     {
-        if (IsGameOver || IsPaused) return;
+        if (_disposed || IsPaused) return;
         IsPaused = true;
-        _gameLoop.Pause();
+        if (!IsGameOver)
+            _gameLoop.Pause();
+        _music?.Pause();
         _inputDrainTimer.Stop();
     }
 
     public void Resume()
     {
-        if (!IsPaused) return;
+        if (_disposed || !IsPaused) return;
         IsPaused = false;
         _inputDrainTimer.Start();
-        _gameLoop.Resume();
+        if (!IsGameOver)
+            _gameLoop.Resume();
+        _music?.Resume();
     }
 
     private int _score;
@@ -64,6 +81,43 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
         private set { _linesCleared = value; OnPropertyChanged(); }
     }
 
+    private const double GaugeMaxPixelHeight = 520.0;
+
+    private double _sabotageGaugePercent;
+    public double SabotageGaugePercent
+    {
+        get => _sabotageGaugePercent;
+        private set { _sabotageGaugePercent = value; OnPropertyChanged(); OnPropertyChanged(nameof(SabotageBarHeight)); }
+    }
+
+    public double SabotageBarHeight => _sabotageGaugePercent * GaugeMaxPixelHeight;
+
+    private bool _canSabotage = true;
+
+    private bool _isGaugeFull;
+    public bool IsGaugeFull
+    {
+        get => _isGaugeFull;
+        private set { _isGaugeFull = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsGaugeVisible)); OnPropertyChanged(nameof(IsSabotageSelectorVisible)); OnPropertyChanged(nameof(IsGaugeFullIndicatorVisible)); }
+    }
+
+    public bool IsGaugeVisible => !IsGaugeFull;
+    public bool IsSabotageSelectorVisible => _isGaugeFull && _canSabotage;
+    public bool IsGaugeFullIndicatorVisible => _isGaugeFull && !_canSabotage;
+
+    public SabotagePieceItemViewModel[] SabotageSelectorItems { get; }
+
+    public event Action<TetrominoType>? SabotageActivated;
+
+    public void ActivateSabotage(TetrominoType type)
+    {
+        if (!IsGaugeFull) return;
+        SabotageActivated?.Invoke(type);
+        _boardService.ConsumeSabotageCharge();
+    }
+
+    public void ConsumeSabotageCharge() => _boardService.ConsumeSabotageCharge();
+
     public event Action? ReturnToMenuRequested;
     public event PropertyChangedEventHandler? PropertyChanged;
     private void OnPropertyChanged([CallerMemberName] string? name = null)
@@ -71,10 +125,20 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
 
     public BoardViewModel() : this(new BoardService()) { }
 
-    public BoardViewModel(IBoardService boardService, bool autoStart = true)
+    public BoardViewModel(
+        IBoardService boardService,
+        bool autoStart = true,
+        bool enableMusic = true,
+        bool stopMusicOnGameOver = true,
+        bool showGhost = true,
+        bool canSabotage = true)
     {
         _boardService = boardService;
         _gameLoop = new GameLoopService(_boardService);
+        _music = enableMusic ? new GameMusicService() : null;
+        _stopMusicOnGameOver = stopMusicOnGameOver;
+        ShowGhost = showGhost;
+        _canSabotage = canSabotage;
 
         Cells = Enumerable.Range(0, BoardState.Rows * BoardState.Cols)
                           .Select(_ => new CellViewModel())
@@ -84,9 +148,16 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
                                    .Select(_ => new CellViewModel())
                                    .ToArray();
 
+        SabotageSelectorItems = Enum.GetValues<TetrominoType>()
+                                    .Select(t => new SabotagePieceItemViewModel(t, ActivateSabotage))
+                                    .ToArray();
+
         _boardService.StateChanged += RefreshGrid;
         _boardService.GameOver += StartGameOverAnimation;
         _boardService.GameOver += StopInputDrain;
+        if (_stopMusicOnGameOver)
+            _boardService.GameOver += StopMusic;
+        _gameLoop.SpeedLevelChanged += OnGameSpeedLevelChanged;
 
         _inputDrainTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
         _inputDrainTimer.Tick += DrainInputQueue;
@@ -97,6 +168,10 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
 
     public void Start()
     {
+        if (_disposed)
+            return;
+
+        _music?.Start();
         _inputDrainTimer.Start();
         _gameLoop.Start();
     }
@@ -121,6 +196,9 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
     }
 
     private void StopInputDrain() => _inputDrainTimer.Stop();
+    public void StopMusic() => _music?.Stop();
+
+    private void OnGameSpeedLevelChanged(int speedLevel) => _music?.SetSpeedLevel(speedLevel);
 
     private void StartGameOverAnimation()
     {
@@ -171,6 +249,9 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
     private void Restart()
     {
         _gameLoop.Stop();
+        _music?.Stop();
+        _lineClearAnimationVersion++;
+        _isLineClearAnimating = false;
         IsGameOver = false;
 
         var state = _boardService.State;
@@ -179,8 +260,11 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
         state.NextPiece = null;
         state.Score = 0;
         state.LinesCleared = 0;
+        state.SabotageCharge = 0;
         Score = 0;
         LinesCleared = 0;
+        SabotageGaugePercent = 0;
+        IsGaugeFull = false;
         for (int r = 0; r < BoardState.Rows; r++)
             for (int c = 0; c < BoardState.Cols; c++)
                 state.Grid[r, c] = null;
@@ -188,11 +272,51 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
         Start();
     }
 
+    public void Dispose()
+    {
+        if (_disposed)
+            return;
+
+        _disposed = true;
+        _gameLoop.Stop();
+        _inputDrainTimer.Stop();
+        _lineClearAnimationVersion++;
+        _boardService.StateChanged -= RefreshGrid;
+        _boardService.GameOver -= StartGameOverAnimation;
+        _boardService.GameOver -= StopInputDrain;
+        if (_stopMusicOnGameOver)
+            _boardService.GameOver -= StopMusic;
+        _gameLoop.SpeedLevelChanged -= OnGameSpeedLevelChanged;
+        _music?.Dispose();
+    }
+
     private void RefreshGrid()
     {
         var state = _boardService.State;
+        int previousLinesCleared = LinesCleared;
+
         Score = state.Score;
         LinesCleared = state.LinesCleared;
+        SabotageGaugePercent = state.SabotageCharge / (double)BoardState.SabotageGaugeMax;
+        IsGaugeFull = state.SabotageCharge >= BoardState.SabotageGaugeMax;
+
+        if (!_isLineClearAnimating
+            && state.LinesCleared > previousLinesCleared
+            && _boardService.LastClearedRows.Count > 0)
+        {
+            StartLineClearAnimation(_boardService.LastClearedRows);
+            return;
+        }
+
+        if (_isLineClearAnimating)
+            return;
+
+        RenderGridFromState();
+    }
+
+    private void RenderGridFromState()
+    {
+        var state = _boardService.State;
 
         for (int r = 0; r < BoardState.Rows; r++)
             for (int c = 0; c < BoardState.Cols; c++)
@@ -231,6 +355,65 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
                 int idx = cell.Row * 4 + cell.Col;
                 if (idx < NextPieceCells.Length)
                     NextPieceCells[idx].Background = CellViewModel.GetBrush(state.NextPiece.Type);
+            }
+        }
+    }
+
+    private void StartLineClearAnimation(IReadOnlyList<int> rows)
+    {
+        var rowsToAnimate = rows
+            .Where(row => row >= 0 && row < BoardState.Rows)
+            .Distinct()
+            .ToArray();
+
+        if (rowsToAnimate.Length == 0)
+        {
+            RenderGridFromState();
+            return;
+        }
+
+        _isLineClearAnimating = true;
+        int version = ++_lineClearAnimationVersion;
+        int frame = 0;
+        ApplyLineClearDissolveFrame(rowsToAnimate, frame);
+
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(LineClearFrameMs) };
+        timer.Tick += (_, _) =>
+        {
+            if (version != _lineClearAnimationVersion)
+            {
+                timer.Stop();
+                return;
+            }
+
+            frame++;
+            if (frame >= LineClearFrameCount)
+            {
+                timer.Stop();
+                _isLineClearAnimating = false;
+                RenderGridFromState();
+                return;
+            }
+
+            ApplyLineClearDissolveFrame(rowsToAnimate, frame);
+        };
+        timer.Start();
+    }
+
+    private void ApplyLineClearDissolveFrame(int[] rows, int frame)
+    {
+        int transparentCells = frame * BoardState.Cols / (LineClearFrameCount - 1);
+        var activeBrush = frame % 2 == 0 ? LineClearBrightBrush : LineClearDimBrush;
+
+        foreach (int row in rows)
+        {
+            for (int orderIndex = 0; orderIndex < LineClearDissolveOrder.Length; orderIndex++)
+            {
+                int col = LineClearDissolveOrder[orderIndex];
+                int cellIndex = row * BoardState.Cols + col;
+                Cells[cellIndex].Background = orderIndex < transparentCells
+                    ? Brushes.Transparent
+                    : activeBrush;
             }
         }
     }

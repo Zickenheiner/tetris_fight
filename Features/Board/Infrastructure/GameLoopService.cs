@@ -8,6 +8,9 @@ public class GameLoopService
     private readonly IBoardService _boardService;
     private readonly DispatcherTimer _timer;
     private int _tickCount;
+    private int _speedLevel;
+
+    public event Action<int>? SpeedLevelChanged;
 
     public GameLoopService(IBoardService boardService)
     {
@@ -20,7 +23,9 @@ public class GameLoopService
     public void Start()
     {
         _tickCount = 0;
+        _speedLevel = 0;
         _timer.Interval = TimeSpan.FromMilliseconds(500);
+        SpeedLevelChanged?.Invoke(_speedLevel);
         _boardService.SpawnPiece();
         _timer.Start();
     }
@@ -38,6 +43,8 @@ public class GameLoopService
         {
             var faster = TimeSpan.FromMilliseconds(Math.Max(200, _timer.Interval.TotalMilliseconds - 15));
             _timer.Interval = faster;
+            _speedLevel++;
+            SpeedLevelChanged?.Invoke(_speedLevel);
         }
 
         if (!_boardService.TryMoveDown())

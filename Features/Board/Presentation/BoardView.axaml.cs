@@ -44,7 +44,14 @@ public partial class BoardView : UserControl
     private void OnQuitClick(object? sender, RoutedEventArgs e)
     {
         if (DataContext is BoardViewModel vm)
-            vm.Resume();
+            vm.Dispose();
         ReturnToMenuRequested?.Invoke();
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        if (DataContext is BoardViewModel vm)
+            vm.Dispose();
     }
 }
