@@ -17,6 +17,10 @@ public sealed class AiPlayerService : IAiPlayerService
     private Tetromino? _lastSpawnedPiece;
     private bool _isExecuting;
     private bool _disposed;
+    private bool _paused;
+
+    public void Pause() => _paused = true;
+    public void Resume() => _paused = false;
 
     public AiPlayerService(IBoardService board)
     {
@@ -26,7 +30,7 @@ public sealed class AiPlayerService : IAiPlayerService
 
     private void OnStateChanged()
     {
-        if (_isExecuting) return;
+        if (_isExecuting || _paused) return;
 
         var state = _board.State;
         if (state.IsGameOver || state.CurrentPiece is null) return;
@@ -49,7 +53,7 @@ public sealed class AiPlayerService : IAiPlayerService
 
     private void ExecuteMove()
     {
-        if (_disposed) return;
+        if (_disposed || _paused) return;
         var state = _board.State;
         if (state.IsGameOver || state.CurrentPiece is null) return;
 

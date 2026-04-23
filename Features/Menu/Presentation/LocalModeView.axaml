@@ -1,0 +1,90 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="tetris_fight.Features.Menu.Presentation.LocalModeView">
+
+    <UserControl.Background>
+        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#06060e" Offset="0"/>
+            <GradientStop Color="#09091a" Offset="1"/>
+        </LinearGradientBrush>
+    </UserControl.Background>
+
+    <Grid RowDefinitions="*,Auto,*" Width="380" HorizontalAlignment="Center">
+
+        <!-- Titre -->
+        <StackPanel Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                    Spacing="0" Margin="0,0,0,48">
+            <Border BoxShadow="0 0 48 12 #3300F0F0" HorizontalAlignment="Center" Padding="8,0">
+                <TextBlock Text="JOUER"
+                           Foreground="#00F0F0" FontFamily="Courier New"
+                           FontWeight="Black" FontSize="40" LetterSpacing="6"
+                           HorizontalAlignment="Center"/>
+            </Border>
+            <Border BoxShadow="0 0 48 12 #3300F080" HorizontalAlignment="Center"
+                    Padding="8,0" Margin="0,-4,0,0">
+                <TextBlock Text="EN LOCAL"
+                           Foreground="#00F080" FontFamily="Courier New"
+                           FontWeight="Black" FontSize="40" LetterSpacing="6"
+                           HorizontalAlignment="Center"/>
+            </Border>
+        </StackPanel>
+
+        <!-- Boutons de sélection -->
+        <StackPanel Grid.Row="1" Spacing="16" HorizontalAlignment="Center">
+
+            <!-- Solo -->
+            <Button Name="SoloButton"
+                    Click="OnSoloClick"
+                    Width="280" Height="80"
+                    Background="#0a0a1e"
+                    BorderBrush="#00F0F0" BorderThickness="1"
+                    CornerRadius="4"
+                    Cursor="Hand">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="4">
+                    <TextBlock Text="SOLO"
+                               Foreground="#00F0F0" FontFamily="Courier New"
+                               FontSize="22" FontWeight="Bold" LetterSpacing="4"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Un joueur, sans adversaire"
+                               Foreground="#555577" FontFamily="Courier New"
+                               FontSize="11" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <!-- Contre IA -->
+            <Button Name="AiButton"
+                    Click="OnAiClick"
+                    Width="280" Height="80"
+                    Background="#0a0a1e"
+                    BorderBrush="#00F080" BorderThickness="1"
+                    CornerRadius="4"
+                    Cursor="Hand">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="4">
+                    <TextBlock Text="CONTRE IA"
+                               Foreground="#00F080" FontFamily="Courier New"
+                               FontSize="22" FontWeight="Bold" LetterSpacing="4"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Affrontez l'ordinateur"
+                               Foreground="#555577" FontFamily="Courier New"
+                               FontSize="11" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+        </StackPanel>
+
+        <!-- Bouton retour -->
+        <StackPanel Grid.Row="2" VerticalAlignment="Top" Margin="0,40,0,0"
+                    HorizontalAlignment="Center">
+            <Button Content="← RETOUR AU MENU"
+                    Background="Transparent"
+                    Foreground="#444466"
+                    BorderThickness="0"
+                    FontFamily="Courier New"
+                    FontSize="13"
+                    LetterSpacing="1"
+                    Cursor="Hand"
+                    Click="OnBackClick"/>
+        </StackPanel>
+    </Grid>
+
+</UserControl>

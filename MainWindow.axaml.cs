@@ -27,7 +27,7 @@ public partial class MainWindow : Window
         switch (action)
         {
             case "Jouer en local":
-                ShowLocalGame();
+                ShowLocalModeSelection();
                 break;
             case "Héberger une partie":
                 ShowHostLobby();
@@ -41,7 +41,25 @@ public partial class MainWindow : Window
         }
     }
 
-    private void ShowLocalGame()
+    private void ShowLocalModeSelection()
+    {
+        ResizeTo(460, 660);
+        var view = new LocalModeView();
+        view.SoloRequested        += ShowSoloGame;
+        view.VsAiRequested        += ShowVsAiGame;
+        view.ReturnToMenuRequested += ShowMenu;
+        MainContent.Content = view;
+    }
+
+    private void ShowSoloGame()
+    {
+        ResizeTo(460, 620);
+        var view = new BoardView();
+        view.ReturnToMenuRequested += ShowMenu;
+        MainContent.Content = view;
+    }
+
+    private void ShowVsAiGame()
     {
         ResizeTo(760, 620);
         var view = new TwoPlayerView();

@@ -4,8 +4,8 @@
              x:Class="tetris_fight.Features.Board.Presentation.BoardView"
              x:DataType="vm:BoardViewModel">
 
-    <Grid ColumnDefinitions="Auto,Auto" Background="#0d0d1a"
-          HorizontalAlignment="Center" VerticalAlignment="Center">
+    <Grid Background="#0d0d1a" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <Grid ColumnDefinitions="Auto,Auto">
 
         <!-- Plateau de jeu 10×20 avec overlay game over -->
         <Grid Grid.Column="0">
@@ -88,5 +88,35 @@
                        HorizontalAlignment="Center"/>
         </StackPanel>
 
+    </Grid>
+
+    <!-- Overlay pause -->
+    <Border IsVisible="{Binding IsPaused}" Background="#DD000011"
+            HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="20">
+            <TextBlock Text="PAUSE"
+                       Foreground="#ffffff" FontFamily="Courier New"
+                       FontSize="36" FontWeight="Black" LetterSpacing="8"
+                       HorizontalAlignment="Center"/>
+            <Button Name="ResumeButton" Click="OnResumeClick"
+                    Width="220" Height="52"
+                    Background="#0a0a1e" BorderBrush="#00F0F0" BorderThickness="1"
+                    CornerRadius="4" Cursor="Hand">
+                <TextBlock Text="REPRENDRE"
+                           Foreground="#00F0F0" FontFamily="Courier New"
+                           FontSize="16" FontWeight="Bold" LetterSpacing="3"
+                           HorizontalAlignment="Center"/>
+            </Button>
+            <Button Name="QuitButton" Click="OnQuitClick"
+                    Width="220" Height="52"
+                    Background="#0a0a1e" BorderBrush="#F04040" BorderThickness="1"
+                    CornerRadius="4" Cursor="Hand">
+                <TextBlock Text="QUITTER"
+                           Foreground="#F04040" FontFamily="Courier New"
+                           FontSize="16" FontWeight="Bold" LetterSpacing="3"
+                           HorizontalAlignment="Center"/>
+            </Button>
+        </StackPanel>
+    </Border>
     </Grid>
 </UserControl>

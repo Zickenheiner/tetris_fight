@@ -26,6 +26,8 @@ public class GameLoopService
     }
 
     public void Stop() => _timer.Stop();
+    public void Pause() => _timer.Stop();
+    public void Resume() => _timer.Start();
 
     private void OnTick(object? sender, EventArgs e)
     {

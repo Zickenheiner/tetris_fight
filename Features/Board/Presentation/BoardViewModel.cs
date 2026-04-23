@@ -27,6 +27,29 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
         private set { _isGameOver = value; OnPropertyChanged(); }
     }
 
+    private bool _isPaused;
+    public bool IsPaused
+    {
+        get => _isPaused;
+        private set { _isPaused = value; OnPropertyChanged(); }
+    }
+
+    public void Pause()
+    {
+        if (IsGameOver || IsPaused) return;
+        IsPaused = true;
+        _gameLoop.Pause();
+        _inputDrainTimer.Stop();
+    }
+
+    public void Resume()
+    {
+        if (!IsPaused) return;
+        IsPaused = false;
+        _inputDrainTimer.Start();
+        _gameLoop.Resume();
+    }
+
     private int _score;
     public int Score
     {
@@ -127,6 +150,12 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel
             if (key == Key.Escape) ReturnToMenuRequested?.Invoke();
             return;
         }
+        if (key == Key.Escape)
+        {
+            if (IsPaused) Resume(); else Pause();
+            return;
+        }
+        if (IsPaused) return;
         switch (key)
         {
             case Key.Left:  _inputQueue.Enqueue(GameInput.MoveLeft); break;

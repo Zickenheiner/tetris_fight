@@ -3,6 +3,7 @@ namespace tetris_fight.Features.Network.Presentation;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using tetris_fight.Features.Network.Infrastructure;
 
 public partial class NetworkGameView : UserControl
@@ -37,6 +38,20 @@ public partial class NetworkGameView : UserControl
             vm.HandleKey(e.Key);
             e.Handled = true;
         }
+    }
+
+    private void OnResumeClick(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is NetworkGameViewModel vm)
+            vm.CloseMenu();
+        Focus();
+    }
+
+    private void OnQuitClick(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is NetworkGameViewModel vm)
+            vm.CloseMenu();
+        ReturnToMenuRequested?.Invoke();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)

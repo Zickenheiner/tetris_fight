@@ -3,6 +3,7 @@ namespace tetris_fight.Features.Board.Presentation;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 
 public partial class TwoPlayerView : UserControl
 {
@@ -26,14 +27,31 @@ public partial class TwoPlayerView : UserControl
     protected override void OnKeyDown(KeyEventArgs e)
     {
         base.OnKeyDown(e);
-        if (DataContext is TwoPlayerViewModel vm)
+        if (DataContext is not TwoPlayerViewModel vm) return;
+
+        if (e.Key == Key.Escape)
         {
-            if (e.Key == Key.Escape)
-                vm.RequestReturnToMenu();
-            else
-                vm.PlayerBoard.HandleKey(e.Key);
-            e.Handled = true;
+            if (vm.IsPaused) vm.Resume(); else vm.Pause();
         }
+        else if (!vm.IsPaused)
+        {
+            vm.PlayerBoard.HandleKey(e.Key);
+        }
+        e.Handled = true;
+    }
+
+    private void OnResumeClick(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is TwoPlayerViewModel vm)
+            vm.Resume();
+        Focus();
+    }
+
+    private void OnQuitClick(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is TwoPlayerViewModel vm)
+            vm.Resume();
+        ReturnToMenuRequested?.Invoke();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)

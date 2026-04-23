@@ -28,6 +28,12 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
     private bool _isDisconnected;
     public bool IsDisconnected { get => _isDisconnected; private set { _isDisconnected = value; OnPropertyChanged(); } }
 
+    private bool _isMenuOpen;
+    public bool IsMenuOpen { get => _isMenuOpen; private set { _isMenuOpen = value; OnPropertyChanged(); } }
+
+    public void OpenMenu() => IsMenuOpen = true;
+    public void CloseMenu() => IsMenuOpen = false;
+
     public event Action? ReturnToMenuRequested;
 
     public NetworkGameViewModel(INetworkService network, bool isHost = false)
@@ -121,8 +127,15 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
 
     public void HandleKey(Key key)
     {
-        if (key == Key.Escape) ReturnToMenuRequested?.Invoke();
-        else LocalBoard.HandleKey(key);
+        if (key == Key.Escape)
+        {
+            if (IsDisconnected) ReturnToMenuRequested?.Invoke();
+            else if (IsMenuOpen) CloseMenu();
+            else OpenMenu();
+            return;
+        }
+        if (!IsMenuOpen)
+            LocalBoard.HandleKey(key);
     }
 
     public void Dispose()

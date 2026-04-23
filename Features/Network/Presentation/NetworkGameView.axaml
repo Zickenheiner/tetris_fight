@@ -162,6 +162,35 @@
             </StackPanel>
         </Grid>
 
+        <!-- Overlay menu (sans pause) -->
+        <Border IsVisible="{Binding IsMenuOpen}" Background="#DD000011"
+                HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="20">
+                <TextBlock Text="MENU"
+                           Foreground="#ffffff" FontFamily="Courier New"
+                           FontSize="36" FontWeight="Black" LetterSpacing="8"
+                           HorizontalAlignment="Center"/>
+                <Button Click="OnResumeClick"
+                        Width="220" Height="52"
+                        Background="#0a0a1e" BorderBrush="#00F0F0" BorderThickness="1"
+                        CornerRadius="4" Cursor="Hand">
+                    <TextBlock Text="REPRENDRE"
+                               Foreground="#00F0F0" FontFamily="Courier New"
+                               FontSize="16" FontWeight="Bold" LetterSpacing="3"
+                               HorizontalAlignment="Center"/>
+                </Button>
+                <Button Click="OnQuitClick"
+                        Width="220" Height="52"
+                        Background="#0a0a1e" BorderBrush="#F04040" BorderThickness="1"
+                        CornerRadius="4" Cursor="Hand">
+                    <TextBlock Text="QUITTER"
+                               Foreground="#F04040" FontFamily="Courier New"
+                               FontSize="16" FontWeight="Bold" LetterSpacing="3"
+                               HorizontalAlignment="Center"/>
+                </Button>
+            </StackPanel>
+        </Border>
+
         <!-- Overlay déconnexion -->
         <Border IsVisible="{Binding IsDisconnected}"
                 Background="#DD000011"

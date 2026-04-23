@@ -3,6 +3,7 @@ namespace tetris_fight.Features.Board.Presentation;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 
 public partial class BoardView : UserControl
 {
@@ -31,5 +32,19 @@ public partial class BoardView : UserControl
             vm.HandleKey(e.Key);
             e.Handled = true;
         }
+    }
+
+    private void OnResumeClick(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is BoardViewModel vm)
+            vm.Resume();
+        Focus();
+    }
+
+    private void OnQuitClick(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is BoardViewModel vm)
+            vm.Resume();
+        ReturnToMenuRequested?.Invoke();
     }
 }
