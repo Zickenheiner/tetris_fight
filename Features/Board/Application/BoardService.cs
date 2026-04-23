@@ -185,7 +185,7 @@ public class BoardService : IBoardService
             : new Point(0, (BoardState.Cols - piece.BoundingBoxSize) / 2);
         State.CurrentPiece = piece;
         State.CurrentPosition = pos;
-        StateChanged?.Invoke();
+        HardDrop();
     }
 
     public void SetSeed(int seed)
