@@ -155,7 +155,6 @@ public class BoardService : IBoardService
         int cleared = rowsToClear.Length;
         State.LinesCleared += cleared;
         State.Score += LineScores[Math.Min(cleared, 4)];
-        State.SabotageCharge = Math.Min(State.SabotageCharge + cleared, BoardState.SabotageGaugeMax);
     }
 
     private int[] FindFullRows()
@@ -173,6 +172,12 @@ public class BoardService : IBoardService
     public void ConsumeSabotageCharge()
     {
         State.SabotageCharge = 0;
+        StateChanged?.Invoke();
+    }
+
+    public void AddSabotageCharge(int amount)
+    {
+        State.SabotageCharge = Math.Min(State.SabotageCharge + amount, BoardState.SabotageGaugeMax);
         StateChanged?.Invoke();
     }
 
