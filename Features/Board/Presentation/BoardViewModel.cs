@@ -15,9 +15,14 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel, IDi
 {
     private const int LineClearFrameMs = 40;
     private const int LineClearFrameCount = 6;
+    private const int ForcedPieceFrameMs = 55;
+    private const int ForcedPieceFrameCount = 8;
     private static readonly int[] LineClearDissolveOrder = { 1, 7, 3, 9, 0, 5, 2, 8, 4, 6 };
     private static readonly IBrush LineClearBrightBrush = new SolidColorBrush(Color.Parse("#F6FFB8"));
     private static readonly IBrush LineClearDimBrush = new SolidColorBrush(Color.Parse("#56F0F0"));
+    private static readonly int[] ForcedPieceShakeOffsets = { 0, 1, -1, 1, -1, 0, 0, 0 };
+    private static readonly IBrush ForcedPieceIncomingBrush = new SolidColorBrush(Color.Parse("#64F4FF"));
+    private static readonly IBrush ForcedPieceIncomingBrightBrush = new SolidColorBrush(Color.Parse("#F2FFFF"));
 
     private readonly IBoardService _boardService;
     private readonly GameLoopService _gameLoop;
@@ -26,7 +31,9 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel, IDi
     private readonly GameMusicService? _music;
     private readonly bool _stopMusicOnGameOver;
     private bool _isLineClearAnimating;
+    private bool _isForcedPieceAnimating;
     private int _lineClearAnimationVersion;
+    private int _forcedPieceAnimationVersion;
     private bool _disposed;
 
     public CellViewModel[] Cells { get; }
@@ -155,6 +162,7 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel, IDi
         _boardService.StateChanged += RefreshGrid;
         _boardService.GameOver += StartGameOverAnimation;
         _boardService.GameOver += StopInputDrain;
+        _boardService.ForcedPieceApplied += StartForcedPieceAnimation;
         if (_stopMusicOnGameOver)
             _boardService.GameOver += StopMusic;
         _gameLoop.SpeedLevelChanged += OnGameSpeedLevelChanged;
@@ -251,7 +259,9 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel, IDi
         _gameLoop.Stop();
         _music?.Stop();
         _lineClearAnimationVersion++;
+        _forcedPieceAnimationVersion++;
         _isLineClearAnimating = false;
+        _isForcedPieceAnimating = false;
         IsGameOver = false;
 
         var state = _boardService.State;
@@ -284,6 +294,7 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel, IDi
         _boardService.StateChanged -= RefreshGrid;
         _boardService.GameOver -= StartGameOverAnimation;
         _boardService.GameOver -= StopInputDrain;
+        _boardService.ForcedPieceApplied -= StartForcedPieceAnimation;
         if (_stopMusicOnGameOver)
             _boardService.GameOver -= StopMusic;
         _gameLoop.SpeedLevelChanged -= OnGameSpeedLevelChanged;
@@ -293,6 +304,10 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel, IDi
     private void RefreshGrid()
     {
         var state = _boardService.State;
+
+        if (_isForcedPieceAnimating)
+            return;
+
         int previousLinesCleared = LinesCleared;
 
         Score = state.Score;
@@ -415,6 +430,61 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel, IDi
                     ? Brushes.Transparent
                     : activeBrush;
             }
+        }
+    }
+
+    private void StartForcedPieceAnimation(ForcedPieceAnimation animation)
+    {
+        if (_disposed)
+            return;
+
+        _isForcedPieceAnimating = true;
+        int version = ++_forcedPieceAnimationVersion;
+        int frame = 0;
+        ApplyForcedPieceAnimationFrame(animation, frame);
+
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(ForcedPieceFrameMs) };
+        timer.Tick += (_, _) =>
+        {
+            if (version != _forcedPieceAnimationVersion || _disposed)
+            {
+                timer.Stop();
+                return;
+            }
+
+            frame++;
+            if (frame >= ForcedPieceFrameCount)
+            {
+                timer.Stop();
+                _isForcedPieceAnimating = false;
+                RefreshGrid();
+                return;
+            }
+
+            ApplyForcedPieceAnimationFrame(animation, frame);
+        };
+        timer.Start();
+    }
+
+    private void ApplyForcedPieceAnimationFrame(ForcedPieceAnimation animation, int frame)
+    {
+        RenderGridFromState();
+        int offset = ForcedPieceShakeOffsets[Math.Min(frame, ForcedPieceShakeOffsets.Length - 1)];
+        bool incomingFlash = frame % 2 == 0;
+        ApplyOverlayPiece(
+            animation.IncomingPiece,
+            animation.IncomingPosition with { Col = animation.IncomingPosition.Col + offset },
+            incomingFlash ? ForcedPieceIncomingBrightBrush : ForcedPieceIncomingBrush);
+    }
+
+    private void ApplyOverlayPiece(Tetromino piece, Point position, IBrush brush)
+    {
+        foreach (var cell in piece.Cells)
+        {
+            int r = position.Row + cell.Row;
+            int c = position.Col + cell.Col;
+            if (r >= 0 && r < BoardState.Rows && c >= 0 && c < BoardState.Cols)
+                Cells[r * BoardState.Cols + c].Background = brush;
         }
     }
 }
