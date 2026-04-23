@@ -5,6 +5,7 @@ using tetris_fight.Features.Board.Domain;
 public interface IBoardService
 {
     BoardState State { get; }
+    IReadOnlyList<int> LastClearedRows { get; }
     void SpawnPiece();
     bool TryMoveDown();
     bool TryMoveLeft();
