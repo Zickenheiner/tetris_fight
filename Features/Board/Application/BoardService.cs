@@ -146,7 +146,14 @@ public class BoardService : IBoardService
         {
             State.LinesCleared += cleared;
             State.Score += LineScores[Math.Min(cleared, 4)];
+            State.SabotageCharge = Math.Min(State.SabotageCharge + cleared, BoardState.SabotageGaugeMax);
         }
+    }
+
+    public void ConsumeSabotageCharge()
+    {
+        State.SabotageCharge = 0;
+        StateChanged?.Invoke();
     }
 
     public void SetSeed(int seed)

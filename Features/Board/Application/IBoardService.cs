@@ -14,6 +14,7 @@ public interface IBoardService
     void LockPiece();
     int GetGhostRow();
     void SetSeed(int seed);
+    void ConsumeSabotageCharge();
     event Action? StateChanged;
     event Action? GameOver;
 }

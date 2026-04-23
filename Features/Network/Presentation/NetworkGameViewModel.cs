@@ -112,7 +112,8 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
             NextPiece = next,
             Score = state.Score,
             LinesCleared = state.LinesCleared,
-            IsGameOver = state.IsGameOver
+            IsGameOver = state.IsGameOver,
+            SabotageCharge = state.SabotageCharge
         };
     }
 
