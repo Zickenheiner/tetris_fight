@@ -13,6 +13,13 @@ public sealed class HostLobbyViewModel : INotifyPropertyChanged, IDisposable
     public string IpAddress => _network.LocalIpAddress;
     public int Port => _network.ListenPort;
 
+    private string _pseudo = string.Empty;
+    public string Pseudo
+    {
+        get => _pseudo;
+        set { _pseudo = value; OnPropertyChanged(); }
+    }
+
     private string _status = "En attente d'un joueur...";
     public string Status
     {
@@ -20,7 +27,7 @@ public sealed class HostLobbyViewModel : INotifyPropertyChanged, IDisposable
         private set { _status = value; OnPropertyChanged(); }
     }
 
-    public event Action<TcpNetworkService>? GameReady;
+    public event Action<TcpNetworkService, string>? GameReady;
     public event Action? ReturnToMenuRequested;
 
     public HostLobbyViewModel()
@@ -46,7 +53,7 @@ public sealed class HostLobbyViewModel : INotifyPropertyChanged, IDisposable
     {
         Status = "Joueur connecté !";
         _networkTransferred = true;
-        GameReady?.Invoke(_network);
+        GameReady?.Invoke(_network, string.IsNullOrWhiteSpace(_pseudo) ? "Joueur 1" : _pseudo.Trim());
     }
 
     public void Cancel()

@@ -84,7 +84,7 @@ public partial class MainWindow : Window
         ResizeTo(460, 660);
         var view = new HostLobbyView();
         view.ReturnToMenuRequested += ShowMenu;
-        view.GameReady += StartNetworkGame;
+        view.GameReady += ShowLobbyReady;
         MainContent.Content = view;
     }
 
@@ -93,6 +93,15 @@ public partial class MainWindow : Window
         PlayMenuMusic();
         ResizeTo(460, 660);
         var view = new JoinView();
+        view.ReturnToMenuRequested += ShowMenu;
+        view.GameReady += ShowLobbyReady;
+        MainContent.Content = view;
+    }
+
+    private void ShowLobbyReady(TcpNetworkService network, string myPseudo, bool isHost)
+    {
+        ResizeTo(460, 660);
+        var view = new LobbyReadyView(network, myPseudo, isHost);
         view.ReturnToMenuRequested += ShowMenu;
         view.GameReady += StartNetworkGame;
         MainContent.Content = view;

@@ -1,0 +1,156 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:tetris_fight.Features.Network.Presentation"
+             x:Class="tetris_fight.Features.Network.Presentation.LobbyReadyView"
+             x:DataType="vm:LobbyReadyViewModel"
+             Width="460" Height="660">
+
+    <UserControl.Background>
+        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#06060e" Offset="0"/>
+            <GradientStop Color="#09091a" Offset="1"/>
+        </LinearGradientBrush>
+    </UserControl.Background>
+
+    <Grid>
+
+        <!-- Contenu principal -->
+        <Grid RowDefinitions="*,Auto,*" Width="380" HorizontalAlignment="Center">
+
+            <!-- Titre -->
+            <StackPanel Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                        Spacing="0" Margin="0,0,0,40">
+                <Border BoxShadow="0 0 48 12 #3300F0F0" HorizontalAlignment="Center" Padding="8,0">
+                    <TextBlock Text="SALLE"
+                               Foreground="#00F0F0" FontFamily="Courier New"
+                               FontWeight="Black" FontSize="40" LetterSpacing="6"
+                               HorizontalAlignment="Center"/>
+                </Border>
+                <Border BoxShadow="0 0 48 12 #33F0A000" HorizontalAlignment="Center"
+                        Padding="8,0" Margin="0,-4,0,0">
+                    <TextBlock Text="D'ATTENTE"
+                               Foreground="#F0A000" FontFamily="Courier New"
+                               FontWeight="Black" FontSize="40" LetterSpacing="6"
+                               HorizontalAlignment="Center"/>
+                </Border>
+            </StackPanel>
+
+            <!-- Joueurs + bouton prêt -->
+            <StackPanel Grid.Row="1" Spacing="20" HorizontalAlignment="Center" Width="380">
+
+                <!-- Joueur local -->
+                <Border Background="#0a0a1e" BorderBrush="#2a2a5a" BorderThickness="1"
+                        CornerRadius="4" Padding="20,14">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0" Spacing="4">
+                            <TextBlock Text="TOI"
+                                       Foreground="#555577" FontFamily="Courier New"
+                                       FontSize="10" LetterSpacing="2"/>
+                            <Border BoxShadow="0 0 12 3 #4400F0F0">
+                                <TextBlock Text="{Binding MyPseudo}"
+                                           Foreground="#00F0F0" FontFamily="Courier New"
+                                           FontSize="20" FontWeight="Bold"/>
+                            </Border>
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" VerticalAlignment="Center"
+                                   FontFamily="Courier New" FontSize="13" LetterSpacing="1"
+                                   Foreground="#00F060"
+                                   Text="✔ PRÊT"
+                                   IsVisible="{Binding MyReady}"/>
+                        <TextBlock Grid.Column="1" VerticalAlignment="Center"
+                                   FontFamily="Courier New" FontSize="13" LetterSpacing="1"
+                                   Foreground="#555577"
+                                   Text="EN ATTENTE"
+                                   IsVisible="{Binding !MyReady}"/>
+                    </Grid>
+                </Border>
+
+                <!-- VS séparateur -->
+                <TextBlock Text="VS"
+                           Foreground="#222244" FontFamily="Courier New"
+                           FontWeight="Black" FontSize="22" LetterSpacing="4"
+                           HorizontalAlignment="Center"/>
+
+                <!-- Joueur adversaire -->
+                <Border Background="#0a0a1e" BorderBrush="#2a2a5a" BorderThickness="1"
+                        CornerRadius="4" Padding="20,14">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0" Spacing="4">
+                            <TextBlock Text="ADVERSAIRE"
+                                       Foreground="#555577" FontFamily="Courier New"
+                                       FontSize="10" LetterSpacing="2"/>
+                            <Border BoxShadow="0 0 12 3 #44A000F0">
+                                <TextBlock Text="{Binding OpponentPseudo}"
+                                           Foreground="#A000F0" FontFamily="Courier New"
+                                           FontSize="20" FontWeight="Bold"/>
+                            </Border>
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" VerticalAlignment="Center"
+                                   FontFamily="Courier New" FontSize="13" LetterSpacing="1"
+                                   Foreground="#00F060"
+                                   Text="✔ PRÊT"
+                                   IsVisible="{Binding OpponentReady}"/>
+                        <TextBlock Grid.Column="1" VerticalAlignment="Center"
+                                   FontFamily="Courier New" FontSize="13" LetterSpacing="1"
+                                   Foreground="#555577"
+                                   Text="EN ATTENTE"
+                                   IsVisible="{Binding !OpponentReady}"/>
+                    </Grid>
+                </Border>
+
+                <!-- Bouton Prêt -->
+                <Button Content="JE SUIS PRÊT !"
+                        IsEnabled="{Binding CanClickReady}"
+                        Background="#0a1a0a"
+                        Foreground="#00F060"
+                        BorderBrush="#00A040"
+                        BorderThickness="1"
+                        FontFamily="Courier New"
+                        FontSize="18"
+                        FontWeight="Bold"
+                        LetterSpacing="3"
+                        Padding="0,16"
+                        CornerRadius="3"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        Cursor="Hand"
+                        Click="OnReadyClick"/>
+
+            </StackPanel>
+
+            <!-- Bouton retour -->
+            <StackPanel Grid.Row="2" VerticalAlignment="Top" Margin="0,30,0,0"
+                        HorizontalAlignment="Center">
+                <Button Content="← RETOUR AU MENU"
+                        Background="Transparent"
+                        Foreground="#444466"
+                        BorderThickness="0"
+                        FontFamily="Courier New"
+                        FontSize="13"
+                        LetterSpacing="1"
+                        Cursor="Hand"
+                        Click="OnCancelClick"/>
+            </StackPanel>
+
+        </Grid>
+
+        <!-- Overlay compte à rebours -->
+        <Grid IsVisible="{Binding IsCountdownVisible}"
+              Background="#CC06060e"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch">
+            <Border HorizontalAlignment="Center" VerticalAlignment="Center"
+                    BoxShadow="0 0 80 20 #8800F0F0">
+                <TextBlock Text="{Binding CountdownText}"
+                           Foreground="#00F0F0"
+                           FontFamily="Courier New"
+                           FontWeight="Black"
+                           FontSize="120"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+            </Border>
+        </Grid>
+
+    </Grid>
+
+</UserControl>

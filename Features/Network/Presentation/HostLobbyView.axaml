@@ -33,7 +33,25 @@
         </StackPanel>
 
         <!-- Contenu -->
-        <StackPanel Grid.Row="1" Spacing="24" HorizontalAlignment="Center">
+        <StackPanel Grid.Row="1" Spacing="24" HorizontalAlignment="Center" Width="320">
+
+            <!-- Pseudo -->
+            <StackPanel Spacing="8">
+                <TextBlock Text="TON PSEUDO"
+                           Foreground="#aaaacc" FontFamily="Courier New"
+                           FontSize="11" LetterSpacing="2"/>
+                <TextBox Text="{Binding Pseudo}"
+                         PlaceholderText="ex: TetrisMaster"
+                         Background="#0a0a1e"
+                         Foreground="#00F0F0"
+                         BorderBrush="#2a2a5a"
+                         BorderThickness="1"
+                         FontFamily="Courier New"
+                         FontSize="18"
+                         Padding="12,8"
+                         CornerRadius="4"
+                         MaxLength="16"/>
+            </StackPanel>
 
             <!-- Adresse IP -->
             <Border Background="#0a0a1e" BorderBrush="#2a2a5a" BorderThickness="1"
