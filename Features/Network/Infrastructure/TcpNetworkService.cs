@@ -23,8 +23,10 @@ public sealed class TcpNetworkService : INetworkService
     private StreamWriter? _writer;
     private readonly object _writeLock = new();
     private bool _disposed;
+    private int? _receivedSeed;
 
     public string LocalIpAddress { get; } = GetLocalIp();
+    public int? ReceivedSeed => _receivedSeed;
     public int ListenPort => Port;
 
     public event Action? Connected;
@@ -158,7 +160,10 @@ public sealed class TcpNetworkService : INetworkService
 
             case NetworkMessageType.Seed when msg.Payload is not null:
                 if (int.TryParse(msg.Payload, out int seed))
+                {
+                    _receivedSeed = seed;
                     Dispatcher.UIThread.Post(() => SeedReceived?.Invoke(seed));
+                }
                 break;
 
             case NetworkMessageType.Sabotage when msg.Payload is not null:

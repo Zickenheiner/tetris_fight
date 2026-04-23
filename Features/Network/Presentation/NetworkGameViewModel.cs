@@ -20,6 +20,7 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
 
     private int _opponentPreviousLines;
 
+    private bool _gameStarted;
     private bool _localDead;
     private bool _opponentDead;
     private bool _matchEnded;
@@ -90,6 +91,8 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
         else
         {
             LocalBoard = new BoardViewModel(_localService, autoStart: false);
+            if (_network.ReceivedSeed.HasValue)
+                OnSeedReceived(_network.ReceivedSeed.Value);
         }
 
         LocalBoard.ReturnToMenuRequested += () => ReturnToMenuRequested?.Invoke();
@@ -182,6 +185,8 @@ public sealed class NetworkGameViewModel : INotifyPropertyChanged, IDisposable
 
     private void OnSeedReceived(int seed)
     {
+        if (_gameStarted) return;
+        _gameStarted = true;
         _localService.SetSeed(seed);
         LocalBoard.Start();
     }
