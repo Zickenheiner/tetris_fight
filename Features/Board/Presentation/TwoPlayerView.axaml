@@ -14,9 +14,8 @@
                 <!-- Jauge / Sélecteur de sabotage (gauche) -->
                 <Grid Grid.Column="0" Width="50" Height="524" Margin="0,0,6,0">
 
-                    <!-- Jauge normale (masquée quand pleine) -->
-                    <Grid IsVisible="{Binding IsGaugeVisible}"
-                          Width="16" HorizontalAlignment="Center">
+                    <!-- Jauge normale -->
+                    <Grid Width="16" HorizontalAlignment="Center">
                         <Border Background="#111130"
                                 BorderBrush="#2e3568"
                                 BorderThickness="1"
@@ -59,8 +58,26 @@
                         </Border>
                     </Grid>
 
+                    <!-- Indicateur clignotant quand jauge pleine mais pas de sélecteur (IA) -->
+                    <Border IsVisible="{Binding IsGaugeFullIndicatorVisible}"
+                            IsHitTestVisible="False"
+                            BorderBrush="#5EDBE8" BorderThickness="1.5"
+                            CornerRadius="8" Width="16" HorizontalAlignment="Center"
+                            Background="Transparent">
+                        <Border.Styles>
+                            <Style Selector="Border">
+                                <Style.Animations>
+                                    <Animation Duration="0:0:1.1" IterationCount="Infinite" PlaybackDirection="Alternate">
+                                        <KeyFrame Cue="0%"><Setter Property="Opacity" Value="0.35"/></KeyFrame>
+                                        <KeyFrame Cue="100%"><Setter Property="Opacity" Value="0.92"/></KeyFrame>
+                                    </Animation>
+                                </Style.Animations>
+                            </Style>
+                        </Border.Styles>
+                    </Border>
+
                     <!-- Sélecteur de pièces (visible quand jauge pleine) -->
-                    <ItemsControl IsVisible="{Binding IsGaugeFull}"
+                    <ItemsControl IsVisible="{Binding IsSabotageSelectorVisible}"
                                   ItemsSource="{Binding SabotageSelectorItems}"
                                   VerticalAlignment="Center" HorizontalAlignment="Center">
                         <ItemsControl.ItemTemplate>

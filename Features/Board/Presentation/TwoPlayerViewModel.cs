@@ -36,7 +36,7 @@ public sealed class TwoPlayerViewModel : INotifyPropertyChanged, IDisposable
         PlayerBoard.SabotageActivated += type => _aiService.ForcePiece(type);
         PlayerBoard.PropertyChanged += OnBoardPropertyChanged;
 
-        AiBoard = new BoardViewModel(_aiService, enableMusic: false);
+        AiBoard = new BoardViewModel(_aiService, enableMusic: false, showGhost: false, canSabotage: false);
         AiBoard.PropertyChanged += OnBoardPropertyChanged;
         _ai = new AiPlayerService(_aiService);
 
