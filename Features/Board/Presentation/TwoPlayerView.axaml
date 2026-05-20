@@ -12,10 +12,11 @@
                   HorizontalAlignment="Center" VerticalAlignment="Center">
 
                 <!-- Jauge / Sélecteur de sabotage (gauche) -->
-                <Grid Grid.Column="0" Width="50" Height="524" Margin="0,0,6,0">
+                <Grid Grid.Column="0" Width="82" Height="524" Margin="0,0,8,0"
+                      ColumnDefinitions="48,48">
 
                     <!-- Jauge normale -->
-                    <Grid Width="16" HorizontalAlignment="Center">
+                    <Grid Grid.Column="1" Width="16" HorizontalAlignment="Center">
                         <Border Background="#111130"
                                 BorderBrush="#2e3568"
                                 BorderThickness="1"
@@ -62,7 +63,7 @@
                     <Border IsVisible="{Binding IsGaugeFullIndicatorVisible}"
                             IsHitTestVisible="False"
                             BorderBrush="#5EDBE8" BorderThickness="1.5"
-                            CornerRadius="8" Width="16" HorizontalAlignment="Center"
+                            CornerRadius="8" Width="16" Grid.Column="1" HorizontalAlignment="Center"
                             Background="Transparent">
                         <Border.Styles>
                             <Style Selector="Border">
@@ -79,13 +80,14 @@
                     <!-- Sélecteur de pièces (visible quand jauge pleine) -->
                     <ItemsControl IsVisible="{Binding IsSabotageSelectorVisible}"
                                   ItemsSource="{Binding SabotageSelectorItems}"
-                                  VerticalAlignment="Center" HorizontalAlignment="Center">
+                                  Grid.Column="0"
+                                  VerticalAlignment="Center" HorizontalAlignment="Right">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="vm:SabotagePieceItemViewModel">
                                 <Button Command="{Binding SelectCommand}"
                                         Margin="0,2" Padding="2"
-                                        Background="Transparent"
-                                        BorderBrush="#5EDBE8" BorderThickness="1"
+                                        Background="#F00A1026"
+                                        BorderBrush="#00D7EA" BorderThickness="1"
                                         CornerRadius="2"
                                         Cursor="Hand"
                                         Focusable="False">
