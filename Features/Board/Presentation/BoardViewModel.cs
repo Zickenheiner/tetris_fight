@@ -9,6 +9,7 @@ using tetris_fight.Features.Audio.Infrastructure;
 using tetris_fight.Features.Board.Application;
 using tetris_fight.Features.Board.Domain;
 using tetris_fight.Features.Board.Infrastructure;
+using tetris_fight.Features.Settings.Application;
 using tetris_fight.Features.Shared;
 
 public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel, IDisposable
@@ -137,14 +138,14 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel, IDi
         bool autoStart = true,
         bool enableMusic = true,
         bool stopMusicOnGameOver = true,
-        bool showGhost = true,
+        bool? showGhost = null,
         bool canSabotage = true)
     {
         _boardService = boardService;
         _gameLoop = new GameLoopService(_boardService);
-        _music = enableMusic ? new GameMusicService() : null;
+        _music = enableMusic ? new GameMusicService(volume: (float)GameSettingsService.Current.MusicVolume) : null;
         _stopMusicOnGameOver = stopMusicOnGameOver;
-        ShowGhost = showGhost;
+        ShowGhost = showGhost ?? GameSettingsService.Current.ShowGhostPiece;
         _canSabotage = canSabotage;
 
         Cells = Enumerable.Range(0, BoardState.Rows * BoardState.Cols)
@@ -242,16 +243,13 @@ public class BoardViewModel : INotifyPropertyChanged, IBoardRenderViewModel, IDi
             return;
         }
         if (IsPaused) return;
-        switch (key)
+        var controls = GameSettingsService.Current.LocalPlayerControls;
+        if (controls.ToGameInput(key) is { } input)
         {
-            case Key.Left:  _inputQueue.Enqueue(GameInput.MoveLeft); break;
-            case Key.Right: _inputQueue.Enqueue(GameInput.MoveRight); break;
-            case Key.Up:    _inputQueue.Enqueue(GameInput.RotateCW); break;
-            case Key.Z:     _inputQueue.Enqueue(GameInput.RotateCCW); break;
-            case Key.Down:  _inputQueue.Enqueue(GameInput.MoveDown); break;
-            case Key.Space: _inputQueue.Enqueue(GameInput.HardDrop); break;
-            case Key.G:     ShowGhost = !ShowGhost; RefreshGrid(); break;
+            _inputQueue.Enqueue(input);
+            return;
         }
+
     }
 
     private void Restart()

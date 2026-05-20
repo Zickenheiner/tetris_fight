@@ -10,7 +10,7 @@ public sealed class AiPlayerService : IAiPlayerService
     private const int ThinkDelayMs = 800;
 
     // Probabilité (0–1) que l'IA choisisse une colonne aléatoire au lieu de l'optimale
-    private const double MistakeRate = 0.30;
+    private const double MistakeRate = 0.20;
 
     private readonly IBoardService _board;
     private readonly Random _rng = new();

@@ -35,7 +35,7 @@ Jeu Tetris multijoueur en temps réel, construit avec **C# / .NET 10** et **Aval
 
 - Évaluation heuristique : hauteur, trous, irrégularité, prédiction de lignes
 - Test des 4 rotations × 14 colonnes par pièce
-- 30 % de taux d'erreur pour un comportement humain
+- 20 % de taux d'erreur pour un comportement humain
 - Délai de réflexion de 800 ms
 - Peut être mise en pause indépendamment
 

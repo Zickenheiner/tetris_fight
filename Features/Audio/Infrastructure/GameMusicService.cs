@@ -15,6 +15,7 @@ public sealed class GameMusicService : IDisposable
     private readonly float _baseRate;
     private readonly float _rateStep;
     private readonly float _maxRate;
+    private float _volume;
     private bool _started;
     private bool _disposed;
 
@@ -29,7 +30,8 @@ public sealed class GameMusicService : IDisposable
         _baseRate = baseRate;
         _rateStep = rateStep;
         _maxRate = maxRate;
-        _player = CreatePlayer(_musicFile, baseRate, volume);
+        _volume = Math.Clamp(volume, 0f, 1f);
+        _player = CreatePlayer(_musicFile, baseRate, _volume);
     }
 
     public void Start()
@@ -76,6 +78,15 @@ public sealed class GameMusicService : IDisposable
         _player.SetRate(rate);
     }
 
+    public void SetVolume(double volume)
+    {
+        if (_disposed)
+            return;
+
+        _volume = (float)Math.Clamp(volume, 0.0, 1.0);
+        _player.SetVolume(_volume);
+    }
+
     public void Dispose()
     {
         if (_disposed)
@@ -112,6 +123,7 @@ public sealed class GameMusicService : IDisposable
         void Pause();
         void Stop();
         void SetRate(float rate);
+        void SetVolume(float volume);
     }
 
     private sealed class NoOpAudioPlayer : IAudioPlayer
@@ -124,6 +136,7 @@ public sealed class GameMusicService : IDisposable
         public void Pause() { }
         public void Stop() { }
         public void SetRate(float rate) { }
+        public void SetVolume(float volume) { }
         public void Dispose() { }
     }
 
@@ -219,6 +232,14 @@ public sealed class GameMusicService : IDisposable
                 return;
 
             Void_objc_msgSend_Float(_player, sel_registerName("setRate:"), rate);
+        }
+
+        public void SetVolume(float volume)
+        {
+            if (_disposed)
+                return;
+
+            Void_objc_msgSend_Float(_player, sel_registerName("setVolume:"), volume);
         }
 
         public void Dispose()
