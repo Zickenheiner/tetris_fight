@@ -4,6 +4,8 @@ using tetris_fight.Features.Board.Presentation;
 using tetris_fight.Features.Menu.Presentation;
 using tetris_fight.Features.Network.Infrastructure;
 using tetris_fight.Features.Network.Presentation;
+using tetris_fight.Features.Settings.Application;
+using tetris_fight.Features.Settings.Presentation;
 
 namespace tetris_fight;
 
@@ -13,11 +15,13 @@ public partial class MainWindow : Window
         musicFile: "assets/sounds/accueil.mp3",
         baseRate: 1.0f,
         rateStep: 0f,
-        maxRate: 1.0f);
+        maxRate: 1.0f,
+        volume: (float)GameSettingsService.Current.MusicVolume);
 
     public MainWindow()
     {
         InitializeComponent();
+        GameSettingsService.SettingsChanged += OnSettingsChanged;
         ShowMenu();
     }
 
@@ -43,10 +47,22 @@ public partial class MainWindow : Window
             case "Rejoindre une partie":
                 ShowJoin();
                 break;
+            case "Paramètres":
+                ShowSettings();
+                break;
             case "Quitter":
                 Close();
                 break;
         }
+    }
+
+    private void ShowSettings()
+    {
+        PlayMenuMusic();
+        ResizeTo(520, 660);
+        var view = new SettingsView();
+        view.ReturnToMenuRequested += ShowMenu;
+        MainContent.Content = view;
     }
 
     private void ShowLocalModeSelection()
@@ -116,9 +132,18 @@ public partial class MainWindow : Window
         MainContent.Content = view;
     }
 
-    private void PlayMenuMusic() => _menuMusic.Start();
+    private void PlayMenuMusic()
+    {
+        _menuMusic.SetVolume(GameSettingsService.Current.MusicVolume);
+        _menuMusic.Start();
+    }
 
     private void StopMenuMusic() => _menuMusic.Stop();
+
+    private void OnSettingsChanged(GameSettings settings)
+    {
+        _menuMusic.SetVolume(settings.MusicVolume);
+    }
 
     private void ResizeTo(int width, int height)
     {
@@ -128,6 +153,7 @@ public partial class MainWindow : Window
 
     protected override void OnClosed(EventArgs e)
     {
+        GameSettingsService.SettingsChanged -= OnSettingsChanged;
         _menuMusic.Dispose();
         base.OnClosed(e);
     }
